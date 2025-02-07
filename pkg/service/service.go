@@ -61,6 +61,7 @@ func (s *Service) GetSwaggerDocs(ctx context.Context, userRoles []string) ([]map
 		}
 		wg.Add(1)
 		go func(rawDoc []byte, extPaths []string) {
+			defer wg.Done()
 			for _, basePath := range extPaths {
 				doc, err := s.transformDoc(rawDoc, basePath)
 				if err != nil {
@@ -79,11 +80,9 @@ func (s *Service) GetSwaggerDocs(ctx context.Context, userRoles []string) ([]map
 				}
 				mu.Lock()
 				docWrappers = append(docWrappers, docWrapper{basePath: basePath, doc: doc})
-				wg.Done()
 				mu.Unlock()
 			}
 		}(rawDoc, item.ExtPaths)
-
 	}
 	wg.Wait()
 	slices.SortStableFunc(docWrappers, func(a, b docWrapper) int {

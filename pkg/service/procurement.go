@@ -13,21 +13,22 @@ func (s *Service) refreshDocs(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	wg := sync.WaitGroup{}
+	wg := &sync.WaitGroup{}
 	for _, service := range services {
 		if err = ctx.Err(); err != nil {
 			break
 		}
 		if len(service.ExtPaths) > 0 {
 			wg.Add(1)
-			go s.handleService(ctx, service)
+			go s.handleService(ctx, wg, service)
 		}
 	}
 	wg.Wait()
 	return nil
 }
 
-func (s *Service) handleService(ctx context.Context, service models.Service) {
+func (s *Service) handleService(ctx context.Context, wg *sync.WaitGroup, service models.Service) {
+	defer wg.Done()
 	ctxWt, cf := context.WithTimeout(ctx, s.timeout)
 	defer cf()
 	doc, err := s.docClt.GetDoc(ctxWt, service.Protocol, service.Host, service.Port)
