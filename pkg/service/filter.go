@@ -72,24 +72,3 @@ func (s *Service) getAccessPolicy(ctx context.Context, fullPath, role, method st
 	defer cf()
 	return s.ladonClt.GetAccessPolicy(ctxWt, role, fullPath, method)
 }
-
-//func getHttpMethods(item spec.PathItem) []string {
-//	var methods []string
-//	switch {
-//	case item.Get != nil:
-//		methods = append(methods, http.MethodGet)
-//	case item.Put != nil:
-//		methods = append(methods, http.MethodPut)
-//	case item.Post != nil:
-//		methods = append(methods, http.MethodPost)
-//	case item.Delete != nil:
-//		methods = append(methods, http.MethodDelete)
-//	case item.Options != nil:
-//		methods = append(methods, http.MethodOptions)
-//	case item.Head != nil:
-//		methods = append(methods, http.MethodHead)
-//	case item.Patch != nil:
-//		methods = append(methods, http.MethodPatch)
-//	}
-//	return methods
-//}
