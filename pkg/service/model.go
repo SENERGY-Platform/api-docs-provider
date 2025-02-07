@@ -1,5 +1,7 @@
 package service
 
+import "encoding/json"
+
 const (
 	swaggerHostKey     = "host"
 	swaggerBasePathKey = "basePath"
@@ -7,11 +9,7 @@ const (
 	swaggerPathsKey    = "paths"
 )
 
-func stringInSlice(a string, sl []string) bool {
-	for _, b := range sl {
-		if b == a {
-			return true
-		}
-	}
-	return false
+type docWrapper struct {
+	basePath string
+	doc      map[string]json.RawMessage
 }

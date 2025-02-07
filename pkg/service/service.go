@@ -39,11 +39,6 @@ func New(storageHdl StorageHandler, discoveryHdl DiscoveryHandler, docClt doc_cl
 	}
 }
 
-type docWrapper struct {
-	basePath string
-	doc      map[string]json.RawMessage
-}
-
 func (s *Service) GetSwaggerDocs(ctx context.Context, userRoles []string) ([]map[string]json.RawMessage, error) {
 	data, err := s.storageHdl.List(ctx)
 	if err != nil {
@@ -119,4 +114,13 @@ func (s *Service) transformDoc(rawDoc []byte, basePath string) (map[string]json.
 		doc[swaggerSchemesKey] = b
 	}
 	return doc, nil
+}
+
+func stringInSlice(a string, sl []string) bool {
+	for _, b := range sl {
+		if b == a {
+			return true
+		}
+	}
+	return false
 }
