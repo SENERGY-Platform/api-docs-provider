@@ -61,6 +61,7 @@ func (s *Service) GetSwaggerDocs(ctx context.Context, userRoles []string) ([]map
 		go func(rawDoc []byte, extPaths []string) {
 			defer wg.Done()
 			for _, basePath := range extPaths {
+				util.Logger.Debugf("transforming swagger doc for '%s'", basePath)
 				doc, err := s.transformDoc(rawDoc, basePath)
 				if err != nil {
 					util.Logger.Errorf("transforming swagger doc for '%s' failed: %s", basePath, err)
@@ -76,10 +77,10 @@ func (s *Service) GetSwaggerDocs(ctx context.Context, userRoles []string) ([]map
 						continue
 					}
 				}
-				util.Logger.Debugf("appending swagger doc for '%s' %d", basePath, len(doc))
 				mu.Lock()
 				docWrappers = append(docWrappers, docWrapper{basePath: basePath, doc: doc})
 				mu.Unlock()
+				util.Logger.Debugf("appended swagger doc for '%s'", basePath)
 			}
 		}(rawDoc, item.ExtPaths)
 	}
