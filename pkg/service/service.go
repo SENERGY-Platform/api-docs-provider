@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/doc_clt"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/ladon_clt"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
@@ -24,10 +23,7 @@ type Service struct {
 	adminRoleName string
 }
 
-func New(storageHdl StorageHandler, discoveryHdl DiscoveryHandler, docClt doc_clt.ClientItf, ladonClt ladon_clt.ClientItf, timeout time.Duration, apiGtwHost string, apiGtwPort int, adminRoleName string) *Service {
-	if apiGtwPort > 0 {
-		apiGtwHost = fmt.Sprintf("%s:%d", apiGtwHost, apiGtwPort)
-	}
+func New(storageHdl StorageHandler, discoveryHdl DiscoveryHandler, docClt doc_clt.ClientItf, ladonClt ladon_clt.ClientItf, timeout time.Duration, apiGtwHost string, adminRoleName string) *Service {
 	return &Service{
 		storageHdl:    storageHdl,
 		discoveryHdl:  discoveryHdl,
