@@ -12,6 +12,10 @@ type NotFoundError struct {
 	cError
 }
 
+type InvalidInputError struct {
+	cError
+}
+
 func (e *cError) Error() string {
 	return e.err.Error()
 }
@@ -26,4 +30,8 @@ func NewInternalError(err error) error {
 
 func NewNotFoundError(err error) error {
 	return &NotFoundError{cError{err: err}}
+}
+
+func NewInvalidInputError(err error) error {
+	return &InvalidInputError{cError{err: err}}
 }
