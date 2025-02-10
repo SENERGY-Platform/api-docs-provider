@@ -65,10 +65,12 @@ func (s *Service) refreshDocs(ctx context.Context) error {
 
 func (s *Service) handleService(ctx context.Context, wg *sync.WaitGroup, service models.Service) {
 	defer wg.Done()
+	util.Logger.Debugf("downloading doc from '%s:%d'", service.Host, service.Port)
 	ctxWt, cf := context.WithTimeout(ctx, s.timeout)
 	defer cf()
 	doc, err := s.docClt.GetDoc(ctxWt, service.Protocol, service.Host, service.Port)
 	if err != nil {
+		util.Logger.Debugf("downloading doc from '%s:%d' failed: %s", service.Host, service.Port, err)
 		return
 	}
 	if err = s.validateDoc(doc); err != nil {
