@@ -71,6 +71,7 @@ func main() {
 	srv := service.New(
 		storageHdl,
 		discoveryHdl,
+		srvInfoHdl,
 		docClt,
 		ladonClt,
 		time.Duration(cfg.HttpTimeout),

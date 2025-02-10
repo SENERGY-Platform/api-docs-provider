@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 	"encoding/json"
+	srv_info_hdl "github.com/SENERGY-Platform/go-service-base/srv-info-hdl"
+	srv_info_lib "github.com/SENERGY-Platform/go-service-base/srv-info-hdl/lib"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/doc_clt"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/ladon_clt"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
@@ -16,6 +18,7 @@ import (
 type Service struct {
 	storageHdl    StorageHandler
 	discoveryHdl  DiscoveryHandler
+	srvInfoHdl    srv_info_hdl.SrvInfoHandler
 	docClt        doc_clt.ClientItf
 	ladonClt      ladon_clt.ClientItf
 	timeout       time.Duration
@@ -23,10 +26,11 @@ type Service struct {
 	adminRoleName string
 }
 
-func New(storageHdl StorageHandler, discoveryHdl DiscoveryHandler, docClt doc_clt.ClientItf, ladonClt ladon_clt.ClientItf, timeout time.Duration, apiGtwHost string, adminRoleName string) *Service {
+func New(storageHdl StorageHandler, discoveryHdl DiscoveryHandler, srvInfoHdl srv_info_hdl.SrvInfoHandler, docClt doc_clt.ClientItf, ladonClt ladon_clt.ClientItf, timeout time.Duration, apiGtwHost string, adminRoleName string) *Service {
 	return &Service{
 		storageHdl:    storageHdl,
 		discoveryHdl:  discoveryHdl,
+		srvInfoHdl:    srvInfoHdl,
 		docClt:        docClt,
 		ladonClt:      ladonClt,
 		timeout:       timeout,
@@ -91,6 +95,10 @@ func (s *Service) HealthCheck(ctx context.Context) error {
 		return models.NewInternalError(err)
 	}
 	return nil
+}
+
+func (s *Service) GetSrvInfo(_ context.Context) srv_info_lib.SrvInfo {
+	return s.srvInfoHdl.GetInfo()
 }
 
 func (s *Service) transformDoc(rawDoc []byte, basePath string) (map[string]json.RawMessage, error) {
