@@ -61,7 +61,7 @@ func New(path string) (*Config, error) {
 			Microseconds: true,
 			Terminal:     true,
 		},
-		WorkdirPath: "data",
+		WorkdirPath: "./data",
 		Procurement: ProcurementConfig{
 			Interval: int64(time.Hour * 6),
 		},
