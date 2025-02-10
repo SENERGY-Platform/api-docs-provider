@@ -170,7 +170,7 @@ func readData(p string) (models.StorageData, error) {
 	}
 	defer f.Close()
 	var data models.StorageData
-	err = json.NewEncoder(f).Encode(&data)
+	err = json.NewDecoder(f).Decode(&data)
 	if err != nil {
 		return models.StorageData{}, err
 	}
