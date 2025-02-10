@@ -7,6 +7,7 @@ import (
 	sb_logger "github.com/SENERGY-Platform/go-service-base/logger"
 	srv_info_hdl "github.com/SENERGY-Platform/go-service-base/srv-info-hdl"
 	sb_util "github.com/SENERGY-Platform/go-service-base/util"
+	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/api"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/discovery_hdl"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/doc_clt"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/kong_clt"
@@ -78,7 +79,17 @@ func main() {
 		cfg.ApiGateway,
 		cfg.Filter.AdminRoleName)
 
-	httpServer := util.NewServer(nil, cfg.ServerPort)
+	httpHandler, err := api.New(srv, map[string]string{
+		api.HeaderApiVer:  srvInfoHdl.GetVersion(),
+		api.HeaderSrvName: srvInfoHdl.GetName(),
+	})
+	if err != nil {
+		util.Logger.Error(err)
+		ec = 1
+		return
+	}
+
+	httpServer := util.NewServer(httpHandler, cfg.ServerPort)
 
 	ctx, cf := context.WithCancel(context.Background())
 
