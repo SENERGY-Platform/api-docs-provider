@@ -82,7 +82,7 @@ func (h *Handler) Write(_ context.Context, id string, extPaths []string, data []
 	defer func() {
 		if err != nil {
 			if e := os.RemoveAll(path.Join(h.dirPath, newDirName)); e != nil {
-				util.Logger.Errorf("removing new dir '%s' failed: %s", newDirName, e)
+				util.Logger.Errorf("removing new dir '%s' of '%s' failed: %s", newDirName, id, e)
 			}
 		}
 	}()
@@ -118,7 +118,7 @@ func (h *Handler) Write(_ context.Context, id string, extPaths []string, data []
 	h.items[id] = item
 	if oldDirName != "" {
 		if e := os.RemoveAll(path.Join(h.dirPath, oldDirName)); e != nil {
-			util.Logger.Errorf("removing old dir '%s' failed: %s", oldDirName, e)
+			util.Logger.Errorf("removing old dir '%s' of '%s' failed: %s", oldDirName, id, e)
 		}
 	}
 	return nil
