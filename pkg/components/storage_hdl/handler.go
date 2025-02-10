@@ -34,11 +34,11 @@ func New(dirPath string) *Handler {
 }
 
 func (h *Handler) Init(ctx context.Context) error {
+	if err := os.MkdirAll(h.dirPath, 0770); err != nil {
+		return err
+	}
 	dirEntries, err := fs.ReadDir(os.DirFS(h.dirPath), ".")
 	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return os.MkdirAll(h.dirPath, 0770)
-		}
 		return err
 	}
 	for _, dirEntry := range dirEntries {
