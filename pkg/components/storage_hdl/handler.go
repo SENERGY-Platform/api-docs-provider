@@ -29,6 +29,7 @@ type Handler struct {
 func New(dirPath string) *Handler {
 	return &Handler{
 		dirPath: dirPath,
+		items:   make(map[string]storageItem),
 	}
 }
 
