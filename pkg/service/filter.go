@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
 	"net/http"
 	"path"
 )
@@ -59,7 +58,6 @@ func (s *Service) getAllowedMethods(ctx context.Context, fullPath string, userRo
 			if err != nil {
 				return nil, err
 			}
-			util.Logger.Debugf("%s %s %s -> %v", fullPath, method, role, ok)
 			if ok {
 				allowedMethods[method] = rawMessage
 				break
