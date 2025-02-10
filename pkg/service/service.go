@@ -40,9 +40,12 @@ func New(storageHdl StorageHandler, discoveryHdl DiscoveryHandler, srvInfoHdl sr
 }
 
 func (s *Service) GetSwaggerDocs(ctx context.Context, userRoles []string) ([]map[string]json.RawMessage, error) {
+	if len(userRoles) == 0 {
+		return []map[string]json.RawMessage{}, nil
+	}
 	data, err := s.storageHdl.List(ctx)
 	if err != nil {
-		return nil, models.NewInternalError(err)
+		return []map[string]json.RawMessage{}, models.NewInternalError(err)
 	}
 	isAdmin := stringInSlice(s.adminRoleName, userRoles)
 	var docWrappers []docWrapper
