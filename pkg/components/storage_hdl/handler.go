@@ -49,6 +49,7 @@ func (h *Handler) Init(ctx context.Context) error {
 				util.Logger.Errorf("reading data from %s failed: %v", se.dirName, err)
 			}
 			se.StorageData = data
+			util.Logger.Debugf("loaded data '%s' from storage", se.ID)
 			h.items[se.ID] = se
 		}
 	}
@@ -68,6 +69,7 @@ func (h *Handler) List(_ context.Context) ([]models.StorageData, error) {
 func (h *Handler) Write(_ context.Context, id string, extPaths []string, data []byte) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
+	util.Logger.Debugf("writing data '%s' to storage", id)
 	var err error
 	newDirName, err := genDirName()
 	if err != nil {
@@ -125,6 +127,7 @@ func (h *Handler) Write(_ context.Context, id string, extPaths []string, data []
 func (h *Handler) Read(_ context.Context, id string) ([]byte, error) {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
+	util.Logger.Debugf("reading data '%s' from storage", id)
 	item, ok := h.items[id]
 	if !ok {
 		return nil, models.NewNotFoundError(errors.New("not found"))
@@ -139,6 +142,7 @@ func (h *Handler) Read(_ context.Context, id string) ([]byte, error) {
 func (h *Handler) Delete(_ context.Context, id string) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
+	util.Logger.Debugf("deleting data '%s' from storage", id)
 	item, ok := h.items[id]
 	if !ok {
 		return models.NewNotFoundError(errors.New("not found"))
