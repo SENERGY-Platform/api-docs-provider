@@ -76,6 +76,7 @@ func (s *Service) GetSwaggerDocs(ctx context.Context, userRoles []string) ([]map
 						continue
 					}
 				}
+				util.Logger.Debugf("appending swagger doc for '%s' %d", basePath, len(doc))
 				mu.Lock()
 				docWrappers = append(docWrappers, docWrapper{basePath: basePath, doc: doc})
 				mu.Unlock()
