@@ -72,7 +72,7 @@ func (s *Service) handleService(ctx context.Context, wg *sync.WaitGroup, service
 		return
 	}
 	if err = s.validateDoc(doc); err != nil {
-		util.Logger.Errorf("validating doc for '%s:%d' failed: %s", service.Host, service.Port, err)
+		util.Logger.Warningf("validating doc for '%s:%d' failed: %s", service.Host, service.Port, err)
 		return
 	}
 	if err = s.storageHdl.Write(ctx, service.ID, service.ExtPaths, doc); err != nil {
