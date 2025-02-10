@@ -85,13 +85,16 @@ func (s *Service) GetSwaggerDocs(ctx context.Context, userRoles []string) ([]map
 		}(rawDoc, item.ExtPaths)
 	}
 	wg.Wait()
+	util.Logger.Debugf("providing %d swagger docs", len(docWrappers))
 	slices.SortStableFunc(docWrappers, func(a, b docWrapper) int {
 		return strings.Compare(a.basePath, b.basePath)
 	})
+	util.Logger.Debugf("providing %d swagger docs", len(docWrappers))
 	docs := make([]map[string]json.RawMessage, len(docWrappers))
 	for _, dw := range docWrappers {
 		docs = append(docs, dw.doc)
 	}
+	util.Logger.Debugf("providing %d swagger docs", len(docs))
 	return docs, nil
 }
 
