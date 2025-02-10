@@ -46,10 +46,10 @@ func (h *Handler) Init(ctx context.Context) error {
 			se := storageItem{dirName: dirEntry.Name()}
 			data, err := readData(path.Join(h.dirPath, se.dirName, dataFileName))
 			if err != nil {
-				util.Logger.Errorf("reading data from %s failed: %v", se.dirName, err)
+				util.Logger.Errorf("storage: reading from '%s' failed: %v", se.dirName, err)
 			}
 			se.StorageData = data
-			util.Logger.Debugf("loaded data '%s' from storage", se.ID)
+			util.Logger.Debugf("storage: loaded '%s' from '%s'", se.ID, se.dirName)
 			h.items[se.ID] = se
 		}
 	}
@@ -69,7 +69,6 @@ func (h *Handler) List(_ context.Context) ([]models.StorageData, error) {
 func (h *Handler) Write(_ context.Context, id string, extPaths []string, data []byte) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	util.Logger.Debugf("writing data '%s' to storage", id)
 	var err error
 	newDirName, err := genDirName()
 	if err != nil {
@@ -82,7 +81,7 @@ func (h *Handler) Write(_ context.Context, id string, extPaths []string, data []
 	defer func() {
 		if err != nil {
 			if e := os.RemoveAll(path.Join(h.dirPath, newDirName)); e != nil {
-				util.Logger.Errorf("removing new dir '%s' of '%s' failed: %s", newDirName, id, e)
+				util.Logger.Errorf("storage: removing new dir '%s' of '%s' failed: %s", newDirName, id, e)
 			}
 		}
 	}()
@@ -118,16 +117,16 @@ func (h *Handler) Write(_ context.Context, id string, extPaths []string, data []
 	h.items[id] = item
 	if oldDirName != "" {
 		if e := os.RemoveAll(path.Join(h.dirPath, oldDirName)); e != nil {
-			util.Logger.Errorf("removing old dir '%s' of '%s' failed: %s", oldDirName, id, e)
+			util.Logger.Errorf("storage: removing old dir '%s' of '%s' failed: %s", oldDirName, id, e)
 		}
 	}
+	util.Logger.Debugf("storage: '%s' written to '%s'", id, newDirName)
 	return nil
 }
 
 func (h *Handler) Read(_ context.Context, id string) ([]byte, error) {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
-	util.Logger.Debugf("reading data '%s' from storage", id)
 	item, ok := h.items[id]
 	if !ok {
 		return nil, models.NewNotFoundError(errors.New("not found"))
@@ -142,7 +141,6 @@ func (h *Handler) Read(_ context.Context, id string) ([]byte, error) {
 func (h *Handler) Delete(_ context.Context, id string) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	util.Logger.Debugf("deleting data '%s' from storage", id)
 	item, ok := h.items[id]
 	if !ok {
 		return models.NewNotFoundError(errors.New("not found"))
