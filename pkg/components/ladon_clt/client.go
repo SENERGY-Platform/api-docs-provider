@@ -27,7 +27,7 @@ func New(httpClient base_client.HTTPClient, baseUrl string) *Client {
 }
 
 func (c *Client) GetAccessPolicy(ctx context.Context, role, path, method string) (bool, error) {
-	u, err := url.JoinPath(c.baseUrl, "allowed")
+	u, err := url.JoinPath(c.baseUrl, "access")
 	if err != nil {
 		return false, err
 	}
