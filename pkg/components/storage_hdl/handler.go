@@ -32,12 +32,15 @@ func New(dirPath string) *Handler {
 	}
 }
 
-func (h *Handler) Init() error {
+func (h *Handler) Init(ctx context.Context) error {
 	dirEntries, err := fs.ReadDir(os.DirFS(h.dirPath), ".")
 	if err != nil {
 		return err
 	}
 	for _, dirEntry := range dirEntries {
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
 		if dirEntry.IsDir() {
 			se := storageItem{dirName: dirEntry.Name()}
 			data, err := readData(path.Join(h.dirPath, se.dirName, dataFileName))
