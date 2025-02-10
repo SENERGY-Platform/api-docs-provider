@@ -82,5 +82,15 @@ func (s *Service) handleService(ctx context.Context, wg *sync.WaitGroup, service
 }
 
 func (s *Service) validateDoc(doc []byte) error {
-	return json.Unmarshal(doc, &map[string]json.RawMessage{})
+	var tmp map[string]json.RawMessage
+	if err := json.Unmarshal(doc, &tmp); err != nil {
+		return err
+	}
+	if _, ok := tmp["swagger"]; !ok {
+		return fmt.Errorf("missing 'swagger' key")
+	}
+	if _, ok := tmp["paths"]; !ok {
+		return fmt.Errorf("missing 'paths' key")
+	}
+	return nil
 }
