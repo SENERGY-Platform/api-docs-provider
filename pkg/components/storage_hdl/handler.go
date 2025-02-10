@@ -114,8 +114,10 @@ func (h *Handler) Write(_ context.Context, id string, extPaths []string, data []
 		return err
 	}
 	h.items[id] = item
-	if e := os.RemoveAll(path.Join(h.dirPath, oldDirName)); e != nil {
-		util.Logger.Errorf("removing old dir '%s' failed: %s", oldDirName, e)
+	if oldDirName != "" {
+		if e := os.RemoveAll(path.Join(h.dirPath, oldDirName)); e != nil {
+			util.Logger.Errorf("removing old dir '%s' failed: %s", oldDirName, e)
+		}
 	}
 	return nil
 }
