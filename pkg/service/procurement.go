@@ -86,11 +86,10 @@ func (s *Service) validateDoc(doc []byte) error {
 	if err := json.Unmarshal(doc, &tmp); err != nil {
 		return err
 	}
-	if _, ok := tmp["swagger"]; !ok {
-		return fmt.Errorf("missing 'swagger' key")
+	for key := range tmp {
+		if _, ok := commonSwaggerKeys[key]; ok {
+			return nil
+		}
 	}
-	if _, ok := tmp["paths"]; !ok {
-		return fmt.Errorf("missing 'paths' key")
-	}
-	return nil
+	return fmt.Errorf("missing common swagger keys")
 }

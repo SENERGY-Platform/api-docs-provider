@@ -9,6 +9,13 @@ const (
 	swaggerPathsKey    = "paths"
 )
 
+var commonSwaggerKeys = map[string]struct{}{
+	"swagger": {},
+	"info":    {},
+	"openapi": {},
+	"paths":   {},
+}
+
 type docWrapper struct {
 	basePath string
 	doc      map[string]json.RawMessage
