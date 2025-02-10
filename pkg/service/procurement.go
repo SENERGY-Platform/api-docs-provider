@@ -3,10 +3,46 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
 	"sync"
+	"time"
 )
+
+func (s *Service) RunPeriodicProcurement(ctx context.Context, interval time.Duration) error {
+	util.Logger.Info("starting periodic procurement")
+	var lErr error
+	defer func() {
+		if r := recover(); r != nil {
+			lErr = fmt.Errorf("periodic procurement paniced:\n%v", r)
+		}
+		util.Logger.Info("periodic procurement halted")
+	}()
+	timer := time.NewTimer(time.Microsecond)
+	loop := true
+	for loop {
+		select {
+		case <-timer.C:
+			err := s.refreshDocs(ctx)
+			if err != nil {
+				util.Logger.Errorf("procurement failed: %s", err)
+			}
+			timer.Reset(interval)
+		case <-ctx.Done():
+			loop = false
+			util.Logger.Info("stopping periodic procurement")
+			break
+		}
+	}
+	if !timer.Stop() {
+		select {
+		case <-timer.C:
+		default:
+		}
+	}
+	return lErr
+}
 
 func (s *Service) refreshDocs(ctx context.Context) error {
 	services, err := s.discoveryHdl.GetServices(ctx)
