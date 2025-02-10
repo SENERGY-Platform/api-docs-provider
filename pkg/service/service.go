@@ -86,6 +86,13 @@ func (s *Service) GetSwaggerDocs(ctx context.Context, userRoles []string) ([]map
 	return docs, nil
 }
 
+func (s *Service) HealthCheck(ctx context.Context) error {
+	if _, err := s.storageHdl.List(ctx); err != nil {
+		return models.NewInternalError(err)
+	}
+	return nil
+}
+
 func (s *Service) transformDoc(rawDoc []byte, basePath string) (map[string]json.RawMessage, error) {
 	var doc map[string]json.RawMessage
 	err := json.Unmarshal(rawDoc, &doc)
