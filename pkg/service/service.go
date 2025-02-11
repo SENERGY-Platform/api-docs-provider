@@ -56,24 +56,24 @@ func (s *Service) GetSwaggerDocs(ctx context.Context, userToken string, userRole
 		wg.Add(1)
 		go func(id string, extPaths []string) {
 			defer wg.Done()
-			util.Logger.Debugf("%sreading swagger doc for %v", reqID, extPaths)
+			util.Logger.Debugf("service: %sreading swagger doc for %v", reqID, extPaths)
 			rawDoc, err := s.storageHdl.Read(ctx, id)
 			if err != nil {
-				util.Logger.Errorf("%sreading swagger doc for %v failed: %s", reqID, extPaths, err)
+				util.Logger.Errorf("service: %sreading swagger doc for %v failed: %s", reqID, extPaths, err)
 				return
 			}
 			for _, basePath := range extPaths {
-				util.Logger.Debugf("%stransforming swagger doc for '%s'", reqID, basePath)
+				util.Logger.Debugf("service: %stransforming swagger doc for '%s'", reqID, basePath)
 				doc, err := s.transformDoc(rawDoc, basePath)
 				if err != nil {
-					util.Logger.Errorf("%stransforming swagger doc for '%s' failed: %s", reqID, basePath, err)
+					util.Logger.Errorf("service: %stransforming swagger doc for '%s' failed: %s", reqID, basePath, err)
 					continue
 				}
 				if !isAdmin {
-					util.Logger.Debugf("%sfiltering swagger doc for '%s'", reqID, basePath)
+					util.Logger.Debugf("service: %sfiltering swagger doc for '%s'", reqID, basePath)
 					ok, err := s.filterDoc(ctx, doc, userToken, userRoles, basePath)
 					if err != nil {
-						util.Logger.Errorf("%sfiltering swagger doc for '%s' failed: %s", reqID, basePath, err)
+						util.Logger.Errorf("service: %sfiltering swagger doc for '%s' failed: %s", reqID, basePath, err)
 						continue
 					}
 					if !ok {
@@ -83,7 +83,7 @@ func (s *Service) GetSwaggerDocs(ctx context.Context, userToken string, userRole
 				mu.Lock()
 				docWrappers = append(docWrappers, docWrapper{basePath: basePath, doc: doc})
 				mu.Unlock()
-				util.Logger.Debugf("%sappended swagger doc for '%s'", reqID, basePath)
+				util.Logger.Debugf("service: %sappended swagger doc for '%s'", reqID, basePath)
 			}
 		}(item.ID, item.ExtPaths)
 	}
