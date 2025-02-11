@@ -21,7 +21,10 @@ func (s *Service) filterDoc(ctx context.Context, doc map[string]json.RawMessage,
 	}
 	var newPaths map[string]map[string]json.RawMessage
 	if userToken != "" {
-
+		newPaths, err = s.getNewPathsByToken(ctx, oldPaths, basePath, userToken)
+		if err != nil {
+			return false, err
+		}
 	} else {
 		newPaths, err = s.getNewPathsByRoles(ctx, oldPaths, basePath, userRoles)
 		if err != nil {
@@ -37,6 +40,44 @@ func (s *Service) filterDoc(ctx context.Context, doc map[string]json.RawMessage,
 		return true, nil
 	}
 	return false, nil
+}
+
+func (s *Service) getNewPathsByToken(ctx context.Context, oldPaths map[string]map[string]json.RawMessage, basePath string, userToken string) (map[string]map[string]json.RawMessage, error) {
+	pathMethodMap := make(map[string][]string)
+	for subPath, methods := range oldPaths {
+		fullPath := path.Join(basePath, subPath)
+		for method := range methods {
+			sl := pathMethodMap[fullPath]
+			sl = append(sl, method)
+			pathMethodMap[fullPath] = sl
+		}
+	}
+	ctxWt, cf := context.WithTimeout(ctx, s.timeout)
+	defer cf()
+	accessPolicies, err := s.ladonClt.GetUserAccessPolicy(ctxWt, userToken, pathMethodMap)
+	if err != nil {
+		return nil, err
+	}
+	newPaths := make(map[string]map[string]json.RawMessage)
+	for subPath, methods := range oldPaths {
+		allowedMethods := make(map[string]json.RawMessage)
+		fullPath := path.Join(basePath, subPath)
+		sl, ok := accessPolicies[fullPath]
+		if !ok {
+			continue
+		}
+		for _, method := range sl {
+			rawMessage, ok := methods[method]
+			if !ok {
+				continue
+			}
+			allowedMethods[method] = rawMessage
+		}
+		if len(allowedMethods) > 0 {
+			newPaths[subPath] = allowedMethods
+		}
+	}
+	return newPaths, nil
 }
 
 func (s *Service) getNewPathsByRoles(ctx context.Context, oldPaths map[string]map[string]json.RawMessage, basePath string, userRoles []string) (map[string]map[string]json.RawMessage, error) {
