@@ -98,6 +98,7 @@ func (s *Service) getNewPathsByToken(ctx context.Context, oldPaths map[string]ma
 			newPaths[subPath] = allowedMethods
 		}
 	}
+	fmt.Println(defRefs)
 	return newPaths, defRefs, nil
 }
 
@@ -134,13 +135,11 @@ func (s *Service) getAccessPolicyByRole(ctx context.Context, fullPath, role, met
 }
 
 func getNewDefinitions(oldDefs map[string]json.RawMessage, allowedRefs map[string]struct{}) map[string]json.RawMessage {
-	fmt.Println(allowedRefs)
 	for ref, rawMessage := range oldDefs {
 		if _, ok := allowedRefs[ref]; ok {
 			getDefinitionRefs(rawMessage, allowedRefs)
 		}
 	}
-	fmt.Println(allowedRefs)
 	newDefs := make(map[string]json.RawMessage)
 	for ref := range allowedRefs {
 		if rawMessage, ok := oldDefs[ref]; ok {
