@@ -3,19 +3,8 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"net/http"
 	"path"
 )
-
-var httpMethods = []string{
-	http.MethodGet,
-	http.MethodPut,
-	http.MethodPost,
-	http.MethodDelete,
-	http.MethodOptions,
-	http.MethodHead,
-	http.MethodPatch,
-}
 
 func (s *Service) filterDoc(ctx context.Context, doc map[string]json.RawMessage, userRoles []string, basePath string) (bool, error) {
 	rawPaths, ok := doc[swaggerPathsKey]
