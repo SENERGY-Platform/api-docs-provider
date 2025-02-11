@@ -60,6 +60,24 @@ func (s *Service) refreshDocs(ctx context.Context) error {
 		}
 	}
 	wg.Wait()
+	if err = s.cleanOldServices(ctx, services); err != nil {
+		util.Logger.Errorf("removing old docs failed: %s", err)
+	}
+	return nil
+}
+
+func (s *Service) cleanOldServices(ctx context.Context, services map[string]models.Service) error {
+	storedServices, err := s.storageHdl.List(ctx)
+	if err != nil {
+		return err
+	}
+	for _, service := range storedServices {
+		if _, ok := services[service.ID]; !ok {
+			if err = s.storageHdl.Delete(ctx, service.ID); err != nil {
+				util.Logger.Errorf("removing old doc failed: %s", err)
+			}
+		}
+	}
 	return nil
 }
 
