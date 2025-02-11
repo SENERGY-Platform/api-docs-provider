@@ -55,9 +55,10 @@ func (s *Service) GetSwaggerDocs(ctx context.Context, userToken string, userRole
 		wg.Add(1)
 		go func(id string, extPaths []string) {
 			defer wg.Done()
+			util.Logger.Debugf("reading swagger doc for %v", extPaths)
 			rawDoc, err := s.storageHdl.Read(ctx, id)
 			if err != nil {
-				util.Logger.Errorf("reading swagger doc for %v failed: %s", item.ExtPaths, err)
+				util.Logger.Errorf("reading swagger doc for %v failed: %s", extPaths, err)
 				return
 			}
 			for _, basePath := range extPaths {
