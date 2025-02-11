@@ -9,7 +9,7 @@ const (
 )
 
 const (
-	SwaggerDocsPath = "/"
+	SwaggerDocsPath = "/swagger"
 	HealthCheckPath = "/health-check"
 	InfoPath        = "/info"
 )
