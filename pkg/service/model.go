@@ -3,10 +3,11 @@ package service
 import "encoding/json"
 
 const (
-	swaggerHostKey     = "host"
-	swaggerBasePathKey = "basePath"
-	swaggerSchemesKey  = "schemes"
-	swaggerPathsKey    = "paths"
+	swaggerHostKey        = "host"
+	swaggerBasePathKey    = "basePath"
+	swaggerSchemesKey     = "schemes"
+	swaggerPathsKey       = "paths"
+	swaggerDefinitionsKey = "definitions"
 )
 
 var commonSwaggerKeys = map[string]struct{}{
