@@ -9,5 +9,5 @@ import (
 type Service interface {
 	GetSwaggerDocs(ctx context.Context, userToken string, userRoles []string) ([]map[string]json.RawMessage, error)
 	HealthCheck(ctx context.Context) error
-	GetSrvInfo(_ context.Context) srv_info_lib.SrvInfo
+	GetSrvInfo(ctx context.Context) srv_info_lib.SrvInfo
 }
