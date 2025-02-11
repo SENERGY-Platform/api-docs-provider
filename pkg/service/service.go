@@ -52,14 +52,14 @@ func (s *Service) GetSwaggerDocs(ctx context.Context, userRoles []string) ([]map
 	wg := sync.WaitGroup{}
 	mu := sync.Mutex{}
 	for _, item := range data {
-		rawDoc, err := s.storageHdl.Read(ctx, item.ID)
-		if err != nil {
-			util.Logger.Errorf("reading swagger doc for %v failed: %s", item.ExtPaths, err)
-			continue
-		}
 		wg.Add(1)
-		go func(rawDoc []byte, extPaths []string) {
+		go func(id string, extPaths []string) {
 			defer wg.Done()
+			rawDoc, err := s.storageHdl.Read(ctx, id)
+			if err != nil {
+				util.Logger.Errorf("reading swagger doc for %v failed: %s", item.ExtPaths, err)
+				return
+			}
 			for _, basePath := range extPaths {
 				util.Logger.Debugf("transforming swagger doc for '%s'", basePath)
 				doc, err := s.transformDoc(rawDoc, basePath)
@@ -82,7 +82,7 @@ func (s *Service) GetSwaggerDocs(ctx context.Context, userRoles []string) ([]map
 				mu.Unlock()
 				util.Logger.Debugf("appended swagger doc for '%s'", basePath)
 			}
-		}(rawDoc, item.ExtPaths)
+		}(item.ID, item.ExtPaths)
 	}
 	wg.Wait()
 	slices.SortStableFunc(docWrappers, func(a, b docWrapper) int {
