@@ -59,5 +59,5 @@ func (s *Service) getAllowedMethods(ctx context.Context, fullPath string, userRo
 func (s *Service) getAccessPolicy(ctx context.Context, fullPath, role, method string) (bool, error) {
 	ctxWt, cf := context.WithTimeout(ctx, s.timeout)
 	defer cf()
-	return s.ladonClt.GetAccessPolicy(ctxWt, role, fullPath, method)
+	return s.ladonClt.GetRoleAccessPolicy(ctxWt, role, fullPath, method)
 }
