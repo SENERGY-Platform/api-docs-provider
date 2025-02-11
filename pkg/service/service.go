@@ -69,6 +69,7 @@ func (s *Service) GetSwaggerDocs(ctx context.Context, userToken string, userRole
 					continue
 				}
 				if !isAdmin {
+					util.Logger.Debugf("filtering swagger doc for '%s'", basePath)
 					ok, err := s.filterDoc(ctx, doc, userToken, userRoles, basePath)
 					if err != nil {
 						util.Logger.Errorf("filtering swagger doc for '%s' failed: %s", basePath, err)
