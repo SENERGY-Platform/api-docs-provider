@@ -12,7 +12,7 @@ func GetSwaggerDocsH(srv Service) (string, string, gin.HandlerFunc) {
 		if val := gc.GetHeader(HeaderUserRoles); val != "" {
 			userRoles = strings.Split(val, ", ")
 		}
-		swaggerDocs, err := srv.GetSwaggerDocs(gc.Request.Context(), gc.Request.Header.Get("Authorization"), userRoles)
+		swaggerDocs, err := srv.GetSwaggerDocs(gc.Request.Context(), gc.Request.Header.Get(HeaderAuthorization), userRoles)
 		if err != nil {
 			_ = gc.Error(err)
 			return
