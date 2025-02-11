@@ -47,6 +47,7 @@ func (s *Service) GetSwaggerDocs(ctx context.Context, userToken string, userRole
 	if err != nil {
 		return []map[string]json.RawMessage{}, models.NewInternalError(err)
 	}
+	reqID := getReqID(ctx)
 	isAdmin := stringInSlice(s.adminRoleName, userRoles)
 	var docWrappers []docWrapper
 	wg := sync.WaitGroup{}
@@ -55,24 +56,24 @@ func (s *Service) GetSwaggerDocs(ctx context.Context, userToken string, userRole
 		wg.Add(1)
 		go func(id string, extPaths []string) {
 			defer wg.Done()
-			util.Logger.Debugf("reading swagger doc for %v", extPaths)
+			util.Logger.Debugf("%sreading swagger doc for %v", reqID, extPaths)
 			rawDoc, err := s.storageHdl.Read(ctx, id)
 			if err != nil {
-				util.Logger.Errorf("reading swagger doc for %v failed: %s", extPaths, err)
+				util.Logger.Errorf("%sreading swagger doc for %v failed: %s", reqID, extPaths, err)
 				return
 			}
 			for _, basePath := range extPaths {
-				util.Logger.Debugf("transforming swagger doc for '%s'", basePath)
+				util.Logger.Debugf("%stransforming swagger doc for '%s'", reqID, basePath)
 				doc, err := s.transformDoc(rawDoc, basePath)
 				if err != nil {
-					util.Logger.Errorf("transforming swagger doc for '%s' failed: %s", basePath, err)
+					util.Logger.Errorf("%stransforming swagger doc for '%s' failed: %s", reqID, basePath, err)
 					continue
 				}
 				if !isAdmin {
-					util.Logger.Debugf("filtering swagger doc for '%s'", basePath)
+					util.Logger.Debugf("%sfiltering swagger doc for '%s'", reqID, basePath)
 					ok, err := s.filterDoc(ctx, doc, userToken, userRoles, basePath)
 					if err != nil {
-						util.Logger.Errorf("filtering swagger doc for '%s' failed: %s", basePath, err)
+						util.Logger.Errorf("%sfiltering swagger doc for '%s' failed: %s", reqID, basePath, err)
 						continue
 					}
 					if !ok {
@@ -82,7 +83,7 @@ func (s *Service) GetSwaggerDocs(ctx context.Context, userToken string, userRole
 				mu.Lock()
 				docWrappers = append(docWrappers, docWrapper{basePath: basePath, doc: doc})
 				mu.Unlock()
-				util.Logger.Debugf("appended swagger doc for '%s'", basePath)
+				util.Logger.Debugf("%sappended swagger doc for '%s'", reqID, basePath)
 			}
 		}(item.ID, item.ExtPaths)
 	}
@@ -141,4 +142,14 @@ func stringInSlice(a string, sl []string) bool {
 		}
 	}
 	return false
+}
+
+func getReqID(ctx context.Context) string {
+	val := ctx.Value(models.ContextRequestID)
+	if val != nil {
+		if str, ok := val.(string); ok {
+			return str + " "
+		}
+	}
+	return ""
 }
