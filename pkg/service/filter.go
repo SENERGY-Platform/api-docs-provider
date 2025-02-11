@@ -6,7 +6,7 @@ import (
 	"path"
 )
 
-func (s *Service) filterDoc(ctx context.Context, doc map[string]json.RawMessage, userRoles []string, basePath string) (bool, error) {
+func (s *Service) filterDoc(ctx context.Context, doc map[string]json.RawMessage, userToken string, userRoles []string, basePath string) (bool, error) {
 	rawPaths, ok := doc[swaggerPathsKey]
 	if !ok {
 		return true, nil

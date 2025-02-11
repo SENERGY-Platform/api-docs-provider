@@ -39,8 +39,8 @@ func New(storageHdl StorageHandler, discoveryHdl DiscoveryHandler, srvInfoHdl sr
 	}
 }
 
-func (s *Service) GetSwaggerDocs(ctx context.Context, userRoles []string) ([]map[string]json.RawMessage, error) {
-	if len(userRoles) == 0 {
+func (s *Service) GetSwaggerDocs(ctx context.Context, userToken string, userRoles []string) ([]map[string]json.RawMessage, error) {
+	if userToken == "" && len(userRoles) == 0 {
 		return []map[string]json.RawMessage{}, nil
 	}
 	data, err := s.storageHdl.List(ctx)
@@ -68,7 +68,7 @@ func (s *Service) GetSwaggerDocs(ctx context.Context, userRoles []string) ([]map
 					continue
 				}
 				if !isAdmin {
-					ok, err := s.filterDoc(ctx, doc, userRoles, basePath)
+					ok, err := s.filterDoc(ctx, doc, userToken, userRoles, basePath)
 					if err != nil {
 						util.Logger.Errorf("filtering swagger doc for '%s' failed: %s", basePath, err)
 						continue
