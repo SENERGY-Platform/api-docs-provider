@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"path"
 	"regexp"
 )
@@ -42,22 +41,22 @@ func (s *Service) filterDoc(ctx context.Context, doc map[string]json.RawMessage,
 			return false, err
 		}
 		doc[swaggerPathsKey] = b
+		rawDefs, ok := doc[swaggerDefinitionsKey]
+		if !ok {
+			return true, nil
+		}
+		var oldDefs map[string]json.RawMessage
+		if err = json.Unmarshal(rawDefs, &oldDefs); err != nil {
+			return false, err
+		}
+		newDefs := getNewDefinitions(oldDefs, allowedRefs)
+		b2, err := json.Marshal(newDefs)
+		if err != nil {
+			return false, err
+		}
+		doc[swaggerDefinitionsKey] = b2
 		return true, nil
 	}
-	rawDefs, ok := doc[swaggerDefinitionsKey]
-	if !ok {
-		return true, nil
-	}
-	var oldDefs map[string]json.RawMessage
-	if err = json.Unmarshal(rawDefs, &oldDefs); err != nil {
-		return false, err
-	}
-	newDefs := getNewDefinitions(oldDefs, allowedRefs)
-	b, err := json.Marshal(newDefs)
-	if err != nil {
-		return false, err
-	}
-	doc[swaggerDefinitionsKey] = b
 	return false, nil
 }
 
@@ -98,7 +97,6 @@ func (s *Service) getNewPathsByToken(ctx context.Context, oldPaths map[string]ma
 			newPaths[subPath] = allowedMethods
 		}
 	}
-	fmt.Println(defRefs)
 	return newPaths, defRefs, nil
 }
 
