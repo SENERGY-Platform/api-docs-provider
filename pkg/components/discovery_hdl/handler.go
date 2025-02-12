@@ -3,19 +3,19 @@ package discovery_hdl
 import (
 	"context"
 	"fmt"
-	kong_clt2 "github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/kong_clt"
+	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/kong_clt"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
 	"time"
 )
 
 type Handler struct {
-	kongClient    kong_clt2.ClientItf
+	kongClient    kong_clt.ClientItf
 	timeout       time.Duration
 	hostBlacklist map[string]struct{}
 }
 
-func New(kongClient kong_clt2.ClientItf, timeout time.Duration, hostBlacklist []string) *Handler {
+func New(kongClient kong_clt.ClientItf, timeout time.Duration, hostBlacklist []string) *Handler {
 	blackList := make(map[string]struct{})
 	for _, host := range hostBlacklist {
 		blackList[host] = struct{}{}
@@ -68,8 +68,8 @@ func (h *Handler) GetServices(ctx context.Context) (map[string]models.Service, e
 	return services, nil
 }
 
-func getKongSrvMap(kServices []kong_clt2.Service) map[string]kong_clt2.Service {
-	srvMap := make(map[string]kong_clt2.Service)
+func getKongSrvMap(kServices []kong_clt.Service) map[string]kong_clt.Service {
+	srvMap := make(map[string]kong_clt.Service)
 	for _, kService := range kServices {
 		srvMap[kService.ID] = kService
 	}
