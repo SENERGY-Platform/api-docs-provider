@@ -19,5 +19,9 @@ func GetStatusCode(err error) int {
 	if errors.As(err, &ie) {
 		return http.StatusInternalServerError
 	}
+	var rbe *models.ResourceBusyError
+	if errors.As(err, &rbe) {
+		return http.StatusConflict
+	}
 	return 0
 }
