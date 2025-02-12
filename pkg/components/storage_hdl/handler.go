@@ -66,7 +66,7 @@ func (h *Handler) List(_ context.Context) ([]models.StorageData, error) {
 	return items, nil
 }
 
-func (h *Handler) Write(_ context.Context, id string, extPaths []string, data []byte) error {
+func (h *Handler) Write(ctx context.Context, id string, extPaths []string, data []byte) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	var err error
@@ -78,10 +78,11 @@ func (h *Handler) Write(_ context.Context, id string, extPaths []string, data []
 	if err != nil {
 		return models.NewInternalError(err)
 	}
+	reqID := util.GetReqID(ctx)
 	defer func() {
 		if err != nil {
 			if e := os.RemoveAll(path.Join(h.dirPath, newDirName)); e != nil {
-				util.Logger.Errorf("storage: removing new dir '%s' of '%s' failed: %s", newDirName, id, e)
+				util.Logger.Errorf("storage: %sremoving new dir '%s' of '%s' failed: %s", reqID, newDirName, id, e)
 			}
 		}
 	}()
@@ -117,10 +118,10 @@ func (h *Handler) Write(_ context.Context, id string, extPaths []string, data []
 	h.items[id] = item
 	if oldDirName != "" {
 		if e := os.RemoveAll(path.Join(h.dirPath, oldDirName)); e != nil {
-			util.Logger.Errorf("storage: removing old dir '%s' of '%s' failed: %s", oldDirName, id, e)
+			util.Logger.Errorf("storage: %sremoving old dir '%s' of '%s' failed: %s", reqID, oldDirName, id, e)
 		}
 	}
-	util.Logger.Debugf("storage: '%s' written to '%s'", id, newDirName)
+	util.Logger.Debugf("storage: %s'%s' written to '%s'", reqID, id, newDirName)
 	return nil
 }
 
