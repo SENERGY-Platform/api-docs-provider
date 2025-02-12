@@ -99,6 +99,14 @@ func (s *Service) GetSwaggerDocs(ctx context.Context, userToken string, userRole
 	return docs, nil
 }
 
+func (s *Service) ListDocs(ctx context.Context) ([]models.StorageData, error) {
+	items, err := s.storageHdl.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 func (s *Service) HealthCheck(ctx context.Context) error {
 	if _, err := s.storageHdl.List(ctx); err != nil {
 		return models.NewInternalError(err)
