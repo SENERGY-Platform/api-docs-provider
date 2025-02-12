@@ -9,8 +9,8 @@ import (
 
 type Service interface {
 	SwaggerDocs(ctx context.Context, userToken string, userRoles []string) ([]map[string]json.RawMessage, error)
-	RefreshDocs(ctx context.Context) error
-	ListDocs(ctx context.Context) ([]models.StorageData, error)
+	RefreshStorage(ctx context.Context) error
+	ListStorage(ctx context.Context) ([]models.StorageData, error)
 	HealthCheck(ctx context.Context) error
 	SrvInfo(ctx context.Context) srv_info_lib.SrvInfo
 }

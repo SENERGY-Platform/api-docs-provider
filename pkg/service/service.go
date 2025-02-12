@@ -99,7 +99,7 @@ func (s *Service) SwaggerDocs(ctx context.Context, userToken string, userRoles [
 	return docs, nil
 }
 
-func (s *Service) ListDocs(ctx context.Context) ([]models.StorageData, error) {
+func (s *Service) ListStorage(ctx context.Context) ([]models.StorageData, error) {
 	items, err := s.storageHdl.List(ctx)
 	if err != nil {
 		return nil, err

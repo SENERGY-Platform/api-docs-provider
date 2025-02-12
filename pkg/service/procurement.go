@@ -25,7 +25,7 @@ func (s *Service) RunPeriodicProcurement(ctx context.Context, interval time.Dura
 	for loop {
 		select {
 		case <-timer.C:
-			err := s.RefreshDocs(ctx)
+			err := s.RefreshStorage(ctx)
 			if err != nil {
 				var rbe *models.ResourceBusyError
 				if !errors.As(err, &rbe) {
@@ -48,7 +48,7 @@ func (s *Service) RunPeriodicProcurement(ctx context.Context, interval time.Dura
 	return lErr
 }
 
-func (s *Service) RefreshDocs(ctx context.Context) error {
+func (s *Service) RefreshStorage(ctx context.Context) error {
 	if !s.mu.TryLock() {
 		return models.NewResourceBusyError(errors.New("procurement running"))
 	}

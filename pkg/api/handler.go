@@ -10,7 +10,7 @@ import (
 )
 
 func GetSwaggerDocsH(srv Service) (string, string, gin.HandlerFunc) {
-	return http.MethodGet, SwaggerPath, func(gc *gin.Context) {
+	return http.MethodGet, SwaggerDocsPath, func(gc *gin.Context) {
 		var userRoles []string
 		if val := gc.GetHeader(HeaderUserRoles); val != "" {
 			userRoles = strings.Split(val, ", ")
@@ -24,9 +24,9 @@ func GetSwaggerDocsH(srv Service) (string, string, gin.HandlerFunc) {
 	}
 }
 
-func PatchRefreshDocsH(srv Service) (string, string, gin.HandlerFunc) {
-	return http.MethodPatch, DocsRefreshPath, func(gc *gin.Context) {
-		err := srv.RefreshDocs(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)))
+func PatchStorageRefreshH(srv Service) (string, string, gin.HandlerFunc) {
+	return http.MethodPatch, StorageRefreshPath, func(gc *gin.Context) {
+		err := srv.RefreshStorage(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)))
 		if err != nil {
 			_ = gc.Error(err)
 			return
@@ -35,9 +35,9 @@ func PatchRefreshDocsH(srv Service) (string, string, gin.HandlerFunc) {
 	}
 }
 
-func GetDocsListH(srv Service) (string, string, gin.HandlerFunc) {
-	return http.MethodGet, DocsListPath, func(gc *gin.Context) {
-		list, err := srv.ListDocs(gc.Request.Context())
+func GetStorageListH(srv Service) (string, string, gin.HandlerFunc) {
+	return http.MethodGet, StorageListPath, func(gc *gin.Context) {
+		list, err := srv.ListStorage(gc.Request.Context())
 		if err != nil {
 			_ = gc.Error(err)
 			return
@@ -46,7 +46,7 @@ func GetDocsListH(srv Service) (string, string, gin.HandlerFunc) {
 	}
 }
 
-func GetSrvInfoH(srv Service) (string, string, gin.HandlerFunc) {
+func GetInfoH(srv Service) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, InfoPath, func(gc *gin.Context) {
 		gc.JSON(http.StatusOK, srv.SrvInfo(gc.Request.Context()))
 	}
