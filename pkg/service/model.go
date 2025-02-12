@@ -1,6 +1,8 @@
 package service
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 const (
 	swaggerHostKey        = "host"

@@ -24,6 +24,17 @@ func GetSwaggerDocsH(srv Service) (string, string, gin.HandlerFunc) {
 	}
 }
 
+func PatchRefreshSwaggerDocsH(srv Service) (string, string, gin.HandlerFunc) {
+	return http.MethodPatch, RefreshDocsPath, func(gc *gin.Context) {
+		err := srv.RefreshDocs(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)))
+		if err != nil {
+			_ = gc.Error(err)
+			return
+		}
+		gc.Status(http.StatusOK)
+	}
+}
+
 func GetSrvInfoH(srv Service) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, InfoPath, func(gc *gin.Context) {
 		gc.JSON(http.StatusOK, srv.GetSrvInfo(gc.Request.Context()))

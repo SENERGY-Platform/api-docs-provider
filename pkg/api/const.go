@@ -10,6 +10,7 @@ const (
 
 const (
 	SwaggerDocsPath = "/swagger"
+	RefreshDocsPath = "/refresh"
 	HealthCheckPath = "/health-check"
 	InfoPath        = "/info"
 )

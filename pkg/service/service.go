@@ -24,6 +24,7 @@ type Service struct {
 	timeout       time.Duration
 	apiGtwHost    string
 	adminRoleName string
+	mu            sync.Mutex
 }
 
 func New(storageHdl StorageHandler, discoveryHdl DiscoveryHandler, srvInfoHdl srv_info_hdl.SrvInfoHandler, docClt doc_clt.ClientItf, ladonClt ladon_clt.ClientItf, timeout time.Duration, apiGtwHost string, adminRoleName string) *Service {

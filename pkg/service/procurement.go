@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
@@ -11,27 +12,30 @@ import (
 )
 
 func (s *Service) RunPeriodicProcurement(ctx context.Context, interval time.Duration) error {
-	util.Logger.Info("starting periodic procurement")
+	util.Logger.Info("service: starting periodic procurement")
 	var lErr error
 	defer func() {
 		if r := recover(); r != nil {
 			lErr = fmt.Errorf("periodic procurement paniced:\n%v", r)
 		}
-		util.Logger.Info("periodic procurement halted")
+		util.Logger.Info("service: periodic procurement halted")
 	}()
 	timer := time.NewTimer(time.Microsecond)
 	loop := true
 	for loop {
 		select {
 		case <-timer.C:
-			err := s.refreshDocs(ctx)
+			err := s.RefreshDocs(ctx)
 			if err != nil {
-				util.Logger.Errorf("procurement failed: %s", err)
+				var rbe *models.ResourceBusyError
+				if !errors.As(err, &rbe) {
+					util.Logger.Errorf("service: procurement failed: %s", err)
+				}
 			}
 			timer.Reset(interval)
 		case <-ctx.Done():
 			loop = false
-			util.Logger.Info("stopping periodic procurement")
+			util.Logger.Info("service: stopping periodic procurement")
 			break
 		}
 	}
@@ -44,10 +48,14 @@ func (s *Service) RunPeriodicProcurement(ctx context.Context, interval time.Dura
 	return lErr
 }
 
-func (s *Service) refreshDocs(ctx context.Context) error {
+func (s *Service) RefreshDocs(ctx context.Context) error {
+	if !s.mu.TryLock() {
+		return models.NewResourceBusyError(errors.New("procurement running"))
+	}
+	defer s.mu.Unlock()
 	services, err := s.discoveryHdl.GetServices(ctx)
 	if err != nil {
-		return err
+		return models.NewInternalError(err)
 	}
 	wg := &sync.WaitGroup{}
 	for _, service := range services {
