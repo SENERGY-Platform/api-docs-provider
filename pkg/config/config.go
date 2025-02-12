@@ -3,10 +3,7 @@ package config
 import (
 	config_hdl "github.com/SENERGY-Platform/go-service-base/config-hdl"
 	config_types "github.com/SENERGY-Platform/go-service-base/config-hdl/types"
-	sb_logger "github.com/SENERGY-Platform/go-service-base/logger"
-	envldr "github.com/y-du/go-env-loader"
 	"github.com/y-du/go-log-level/level"
-	"reflect"
 	"time"
 )
 
@@ -27,8 +24,8 @@ type KongConfig struct {
 }
 
 type ProcurementConfig struct {
-	SwaggerDocPath string `json:"swagger_doc_path" env_var:"SWAGGER_DOC_PATH"`
-	Interval       int64  `json:"interval" env_var:"PROCUREMENT_INTERVAL"`
+	SwaggerDocPath string        `json:"swagger_doc_path" env_var:"SWAGGER_DOC_PATH"`
+	Interval       time.Duration `json:"interval" env_var:"PROCUREMENT_INTERVAL"`
 }
 
 type FilterConfig struct {
@@ -38,7 +35,7 @@ type FilterConfig struct {
 
 type DiscoveryConfig struct {
 	Kong          KongConfig `json:"kong" env_var:"KONG_CONFIG"`
-	HostBlacklist []string   `json:"host_blacklist" env_var:"DISCOVERY_HOST_BLACKLIST"`
+	HostBlacklist []string   `json:"host_blacklist" env_var:"DISCOVERY_HOST_BLACKLIST" env_params:"sep=,"`
 }
 
 type Config struct {
@@ -49,7 +46,7 @@ type Config struct {
 	Discovery   DiscoveryConfig   `json:"discovery" env_var:"DISCOVERY_CONFIG"`
 	Procurement ProcurementConfig `json:"procurement" env_var:"PROCUREMENT_CONFIG"`
 	Filter      FilterConfig      `json:"filter" env_var:"FILTER_CONFIG"`
-	HttpTimeout int64             `json:"http_timeout" env_var:"HTTP_TIMEOUT"`
+	HttpTimeout time.Duration     `json:"http_timeout" env_var:"HTTP_TIMEOUT"`
 }
 
 func New(path string) (*Config, error) {
@@ -63,10 +60,10 @@ func New(path string) (*Config, error) {
 		},
 		WorkdirPath: "data",
 		Procurement: ProcurementConfig{
-			Interval: int64(time.Hour * 6),
+			Interval: time.Hour * 6,
 		},
-		HttpTimeout: int64(time.Second * 30),
+		HttpTimeout: time.Second * 30,
 	}
-	err := config_hdl.Load(&cfg, nil, map[reflect.Type]envldr.Parser{reflect.TypeOf(level.Off): sb_logger.LevelParser}, nil, path)
+	err := config_hdl.Load(&cfg, nil, typeParser, nil, path)
 	return &cfg, err
 }

@@ -20,7 +20,6 @@ import (
 	"os"
 	"sync"
 	"syscall"
-	"time"
 )
 
 var version string
@@ -63,7 +62,7 @@ func main() {
 
 	kongClt := kong_clt.New(&http.Client{Transport: http.DefaultTransport}, cfg.Discovery.Kong.BaseURL, cfg.Discovery.Kong.User, cfg.Discovery.Kong.Password.Value())
 
-	discoveryHdl := discovery_hdl.New(kongClt, time.Duration(cfg.HttpTimeout), cfg.Discovery.HostBlacklist)
+	discoveryHdl := discovery_hdl.New(kongClt, cfg.HttpTimeout, cfg.Discovery.HostBlacklist)
 
 	docClt := doc_clt.New(&http.Client{Transport: http.DefaultTransport}, cfg.Procurement.SwaggerDocPath)
 
@@ -75,7 +74,7 @@ func main() {
 		srvInfoHdl,
 		docClt,
 		ladonClt,
-		time.Duration(cfg.HttpTimeout),
+		cfg.HttpTimeout,
 		cfg.ApiGateway,
 		cfg.Filter.AdminRoleName)
 
@@ -109,7 +108,7 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err := srv.RunPeriodicProcurement(ctx, time.Duration(cfg.Procurement.Interval)); err != nil {
+		if err := srv.RunPeriodicProcurement(ctx, cfg.Procurement.Interval); err != nil {
 			util.Logger.Error(err)
 			ec = 1
 		}
