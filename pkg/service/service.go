@@ -47,7 +47,7 @@ func (s *Service) GetSwaggerDocs(ctx context.Context, userToken string, userRole
 	if err != nil {
 		return []map[string]json.RawMessage{}, models.NewInternalError(err)
 	}
-	reqID := getReqID(ctx)
+	reqID := util.GetReqID(ctx)
 	isAdmin := stringInSlice(s.adminRoleName, userRoles)
 	var docWrappers []docWrapper
 	wg := sync.WaitGroup{}
@@ -142,14 +142,4 @@ func stringInSlice(a string, sl []string) bool {
 		}
 	}
 	return false
-}
-
-func getReqID(ctx context.Context) string {
-	val := ctx.Value(models.ContextRequestID)
-	if val != nil {
-		if str, ok := val.(string); ok {
-			return str + " "
-		}
-	}
-	return ""
 }
