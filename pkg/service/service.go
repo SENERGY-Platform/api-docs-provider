@@ -40,7 +40,7 @@ func New(storageHdl StorageHandler, discoveryHdl DiscoveryHandler, srvInfoHdl sr
 	}
 }
 
-func (s *Service) GetSwaggerDocs(ctx context.Context, userToken string, userRoles []string) ([]map[string]json.RawMessage, error) {
+func (s *Service) SwaggerDocs(ctx context.Context, userToken string, userRoles []string) ([]map[string]json.RawMessage, error) {
 	if userToken == "" && len(userRoles) == 0 {
 		return []map[string]json.RawMessage{}, nil
 	}
@@ -114,7 +114,7 @@ func (s *Service) HealthCheck(ctx context.Context) error {
 	return nil
 }
 
-func (s *Service) GetSrvInfo(_ context.Context) srv_info_lib.SrvInfo {
+func (s *Service) SrvInfo(_ context.Context) srv_info_lib.SrvInfo {
 	return s.srvInfoHdl.GetInfo()
 }
 

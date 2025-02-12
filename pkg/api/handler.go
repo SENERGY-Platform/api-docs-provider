@@ -15,7 +15,7 @@ func GetSwaggerDocsH(srv Service) (string, string, gin.HandlerFunc) {
 		if val := gc.GetHeader(HeaderUserRoles); val != "" {
 			userRoles = strings.Split(val, ", ")
 		}
-		swaggerDocs, err := srv.GetSwaggerDocs(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)), gc.Request.Header.Get(HeaderAuthorization), userRoles)
+		swaggerDocs, err := srv.SwaggerDocs(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)), gc.Request.Header.Get(HeaderAuthorization), userRoles)
 		if err != nil {
 			_ = gc.Error(err)
 			return
@@ -37,7 +37,7 @@ func PatchRefreshSwaggerDocsH(srv Service) (string, string, gin.HandlerFunc) {
 
 func GetSrvInfoH(srv Service) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, InfoPath, func(gc *gin.Context) {
-		gc.JSON(http.StatusOK, srv.GetSrvInfo(gc.Request.Context()))
+		gc.JSON(http.StatusOK, srv.SrvInfo(gc.Request.Context()))
 	}
 }
 
