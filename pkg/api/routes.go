@@ -8,7 +8,8 @@ import (
 
 var routes = gin_mw.Routes[Service]{
 	GetSwaggerDocsH,
-	PatchRefreshSwaggerDocsH,
+	PatchRefreshDocsH,
+	GetDocsListH,
 	GetSrvInfoH,
 	GetHealthCheckH,
 }

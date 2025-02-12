@@ -10,7 +10,7 @@ import (
 )
 
 func GetSwaggerDocsH(srv Service) (string, string, gin.HandlerFunc) {
-	return http.MethodGet, SwaggerDocsPath, func(gc *gin.Context) {
+	return http.MethodGet, SwaggerPath, func(gc *gin.Context) {
 		var userRoles []string
 		if val := gc.GetHeader(HeaderUserRoles); val != "" {
 			userRoles = strings.Split(val, ", ")
@@ -24,14 +24,25 @@ func GetSwaggerDocsH(srv Service) (string, string, gin.HandlerFunc) {
 	}
 }
 
-func PatchRefreshSwaggerDocsH(srv Service) (string, string, gin.HandlerFunc) {
-	return http.MethodPatch, RefreshDocsPath, func(gc *gin.Context) {
+func PatchRefreshDocsH(srv Service) (string, string, gin.HandlerFunc) {
+	return http.MethodPatch, DocsRefreshPath, func(gc *gin.Context) {
 		err := srv.RefreshDocs(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)))
 		if err != nil {
 			_ = gc.Error(err)
 			return
 		}
 		gc.Status(http.StatusOK)
+	}
+}
+
+func GetDocsListH(srv Service) (string, string, gin.HandlerFunc) {
+	return http.MethodGet, DocsListPath, func(gc *gin.Context) {
+		list, err := srv.ListDocs(gc.Request.Context())
+		if err != nil {
+			_ = gc.Error(err)
+			return
+		}
+		gc.JSON(http.StatusOK, list)
 	}
 }
 

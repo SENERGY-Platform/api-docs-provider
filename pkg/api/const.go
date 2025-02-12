@@ -9,8 +9,9 @@ const (
 )
 
 const (
-	SwaggerDocsPath = "/swagger"
-	RefreshDocsPath = "/refresh"
+	SwaggerPath     = "/swagger"
+	DocsRefreshPath = "/docs/refresh"
+	DocsListPath    = "/docs/list"
 	HealthCheckPath = "/health-check"
 	InfoPath        = "/info"
 )
