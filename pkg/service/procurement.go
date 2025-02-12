@@ -60,8 +60,9 @@ func (s *Service) refreshDocs(ctx context.Context) error {
 		}
 	}
 	wg.Wait()
+	reqID := util.GetReqID(ctx)
 	if err = s.cleanOldServices(ctx, services); err != nil {
-		util.Logger.Errorf("removing old docs failed: %s", err)
+		util.Logger.Errorf("serivce: %sremoving old docs failed: %s", reqID, err)
 	}
 	return nil
 }
@@ -71,10 +72,11 @@ func (s *Service) cleanOldServices(ctx context.Context, services map[string]mode
 	if err != nil {
 		return err
 	}
+	reqID := util.GetReqID(ctx)
 	for _, service := range storedServices {
 		if _, ok := services[service.ID]; !ok {
 			if err = s.storageHdl.Delete(ctx, service.ID); err != nil {
-				util.Logger.Errorf("removing old doc failed: %s", err)
+				util.Logger.Errorf("serivce: %sremoving old doc failed: %s", reqID, err)
 			}
 		}
 	}
@@ -89,12 +91,13 @@ func (s *Service) handleService(ctx context.Context, wg *sync.WaitGroup, service
 	if err != nil {
 		return
 	}
+	reqID := util.GetReqID(ctx)
 	if err = s.validateDoc(doc); err != nil {
-		util.Logger.Warningf("validating doc for '%s:%d' failed: %s", service.Host, service.Port, err)
+		util.Logger.Warningf("service: %svalidating doc for '%s:%d' failed: %s", reqID, service.Host, service.Port, err)
 		return
 	}
 	if err = s.storageHdl.Write(ctx, service.ID, service.ExtPaths, doc); err != nil {
-		util.Logger.Errorf("writing doc for '%s:%d' failed: %s", service.Host, service.Port, err)
+		util.Logger.Errorf("service: %swriting doc for '%s:%d' failed: %s", reqID, service.Host, service.Port, err)
 		return
 	}
 }
