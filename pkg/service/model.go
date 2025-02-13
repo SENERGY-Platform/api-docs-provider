@@ -5,6 +5,9 @@ import (
 )
 
 const (
+	swaggerKey            = "swagger"
+	swaggerInfoKey        = "info"
+	swaggerOpenApiKey     = "openapi"
 	swaggerHostKey        = "host"
 	swaggerBasePathKey    = "basePath"
 	swaggerSchemesKey     = "schemes"
@@ -12,11 +15,16 @@ const (
 	swaggerDefinitionsKey = "definitions"
 )
 
-var commonSwaggerKeys = map[string]struct{}{
-	"swagger": {},
-	"info":    {},
-	"openapi": {},
-	"paths":   {},
+var swaggerV2Keys = []string{
+	swaggerKey,
+	swaggerInfoKey,
+	swaggerPathsKey,
+}
+
+var swaggerV3Keys = []string{
+	swaggerInfoKey,
+	swaggerOpenApiKey,
+	swaggerPathsKey,
 }
 
 type docWrapper struct {

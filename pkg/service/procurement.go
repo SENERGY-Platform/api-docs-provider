@@ -100,7 +100,7 @@ func (s *Service) handleService(ctx context.Context, wg *sync.WaitGroup, service
 		return
 	}
 	reqID := util.GetReqID(ctx)
-	if err = s.validateDoc(doc); err != nil {
+	if err = validateDoc(doc); err != nil {
 		util.Logger.Warningf("service: %svalidating doc for '%s:%d' failed: %s", reqID, service.Host, service.Port, err)
 		return
 	}
@@ -110,15 +110,23 @@ func (s *Service) handleService(ctx context.Context, wg *sync.WaitGroup, service
 	}
 }
 
-func (s *Service) validateDoc(doc []byte) error {
+func validateDoc(doc []byte) error {
 	var tmp map[string]json.RawMessage
 	if err := json.Unmarshal(doc, &tmp); err != nil {
 		return err
 	}
-	for key := range tmp {
-		if _, ok := commonSwaggerKeys[key]; ok {
-			return nil
+	if !checkForKeys(tmp, swaggerV2Keys) && !checkForKeys(tmp, swaggerV3Keys) {
+		return errors.New("missing required keys")
+	}
+	return nil
+}
+
+func checkForKeys(doc map[string]json.RawMessage, keys []string) bool {
+	c := 0
+	for _, key := range keys {
+		if _, ok := doc[key]; ok {
+			c++
 		}
 	}
-	return fmt.Errorf("missing common swagger keys")
+	return c == len(keys)
 }
