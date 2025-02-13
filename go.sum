@@ -2,8 +2,10 @@ github.com/SENERGY-Platform/gin-middleware v0.5.1 h1:E3LxSnqwP1gLxwtz2FFwUMHzzov
 github.com/SENERGY-Platform/gin-middleware v0.5.1/go.mod h1:r91mZCds/Q2Hfxq5613VrwXdDF2dcL/UlAB28sWLve8=
 github.com/SENERGY-Platform/go-base-http-client v0.1.0 h1:PUiZVEj7/cMSZJ0g5G611tjY9bSh1Eby+tcktrgpiZ0=
 github.com/SENERGY-Platform/go-base-http-client v0.1.0/go.mod h1:NfKW/relIVTkMXhz4OqZlzJXYPQUYEKxwqou8D0B/Kw=
-github.com/SENERGY-Platform/go-service-base/config-hdl v0.1.1 h1:ITwMKdB2EgWn6McDPgS+pc2yjzIrXTKWh4noKp1DOic=
-github.com/SENERGY-Platform/go-service-base/config-hdl v0.1.1/go.mod h1:pQjV0KfwCM91I7LSTUg9t4tgSNSHKiefH/O5+J5N8z8=
+github.com/SENERGY-Platform/go-env-loader v0.5.3 h1:sNM/psxYBs3DeDCw8P8gWM2hvySijwy9t2DdSGdhF1c=
+github.com/SENERGY-Platform/go-env-loader v0.5.3/go.mod h1:vdEOp4x1VIzmCR+5u/4/GmO8bUOkYsP6NQaLy/46AVE=
+github.com/SENERGY-Platform/go-service-base/config-hdl v0.2.0 h1:1UwNggvY5KS54E+NF5eZAZUWfDSXCZIySAgtfqyMbKs=
+github.com/SENERGY-Platform/go-service-base/config-hdl v0.2.0/go.mod h1:+YKSlnOc5NNeZuVA5HE8hmrKCRQwb5FlMvgmpMw2FWk=
 github.com/SENERGY-Platform/go-service-base/logger v0.2.0 h1:O8aGx+JJVyV6AxfcxIVHH6lyXeRMleui6L9J9JEI3vM=
 github.com/SENERGY-Platform/go-service-base/logger v0.2.0/go.mod h1:4g66GXZ3LBa0XSB2eSdDJtqLkm2xuju4qzc77Cf2Nhc=
 github.com/SENERGY-Platform/go-service-base/srv-info-hdl v0.0.3 h1:/A2bZFh3Aol1uXuR0YAxVB4POcRSshBIG2qfIEIW+gg=
@@ -81,8 +83,6 @@ github.com/twitchyliquid64/golang-asm v0.15.1 h1:SU5vSMR7hnwNxj24w34ZyCi/FmDZTkS
 github.com/twitchyliquid64/golang-asm v0.15.1/go.mod h1:a1lVb/DtPvCB8fslRZhAngC2+aY1QWCk3Cedj/Gdt08=
 github.com/ugorji/go/codec v1.2.12 h1:9LC83zGrHhuUA9l16C9AHXAqEV/2wBQ4nkvumAE65EE=
 github.com/ugorji/go/codec v1.2.12/go.mod h1:UNopzCgEMSXjBc6AOMqYvWC1ktqTAfzJZUZgYf6w6lg=
-github.com/y-du/go-env-loader v0.5.2 h1:LxubTfx7zl1VpBNzUQidSp3yub3/7mxMg63QSuRlhd4=
-github.com/y-du/go-env-loader v0.5.2/go.mod h1:QBaFGtrTdp4eiMUjg9UFf1F3TzbEbUhWDeHYyEsqs8Y=
 github.com/y-du/go-log-level v1.0.0 h1:Q4Ffqxmf/tn9DBbOMwcjEGkWwQyYMwPn+FR06k5HJ70=
 github.com/y-du/go-log-level v1.0.0/go.mod h1:lhCvJlDCuSC9GfmtVDXuXc7lbbAd8igxl58qK8SjPX8=
 golang.org/x/arch v0.13.0 h1:KCkqVVV1kGg0X87TFysjCJ8MxtZEIU4Ja/yXGeoECdA=
