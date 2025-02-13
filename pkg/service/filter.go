@@ -10,12 +10,7 @@ import (
 var regRegex = regexp.MustCompile(`\"\$ref\": ?\"#\/definitions\/(.+)\"`)
 
 func (s *Service) filterDoc(ctx context.Context, doc map[string]json.RawMessage, userToken string, userRoles []string, basePath string) (bool, error) {
-	rawPaths, ok := doc[swaggerPathsKey]
-	if !ok {
-		return true, nil
-	}
-	var oldPaths map[string]map[string]json.RawMessage
-	err := json.Unmarshal(rawPaths, &oldPaths)
+	oldPaths, err := getDocPaths(doc)
 	if err != nil {
 		return false, err
 	}
@@ -35,29 +30,23 @@ func (s *Service) filterDoc(ctx context.Context, doc map[string]json.RawMessage,
 			return false, err
 		}
 	}
-	if len(newPaths) > 0 {
-		b, err := json.Marshal(newPaths)
-		if err != nil {
-			return false, err
-		}
-		doc[swaggerPathsKey] = b
-		rawDefs, ok := doc[swaggerDefinitionsKey]
-		if !ok {
-			return true, nil
-		}
-		var oldDefs map[string]json.RawMessage
-		if err = json.Unmarshal(rawDefs, &oldDefs); err != nil {
-			return false, err
-		}
-		newDefs := getNewDefinitions(oldDefs, allowedRefs)
-		b2, err := json.Marshal(newDefs)
-		if err != nil {
-			return false, err
-		}
-		doc[swaggerDefinitionsKey] = b2
+	if len(newPaths) == 0 {
+		return false, nil
+	}
+	if err = setDocPaths(doc, newPaths); err != nil {
+		return false, err
+	}
+	oldDefs, err := getDocDefs(doc)
+	if err != nil {
+		return false, err
+	}
+	if len(oldDefs) == 0 {
 		return true, nil
 	}
-	return false, nil
+	if err = setDocDefs(doc, getNewDefinitions(oldDefs, allowedRefs)); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func (s *Service) getNewPathsByToken(ctx context.Context, oldPaths map[string]map[string]json.RawMessage, basePath string, userToken string) (map[string]map[string]json.RawMessage, map[string]struct{}, error) {
@@ -130,6 +119,49 @@ func (s *Service) getAccessPolicyByRole(ctx context.Context, fullPath, role, met
 	ctxWt, cf := context.WithTimeout(ctx, s.timeout)
 	defer cf()
 	return s.ladonClt.GetRoleAccessPolicy(ctxWt, role, fullPath, method)
+}
+
+func getDocPaths(doc map[string]json.RawMessage) (map[string]map[string]json.RawMessage, error) {
+	rawPaths, ok := doc[swaggerPathsKey]
+	if !ok {
+		return nil, nil
+	}
+	var paths map[string]map[string]json.RawMessage
+	err := json.Unmarshal(rawPaths, &paths)
+	if err != nil {
+		return nil, err
+	}
+	return paths, nil
+}
+
+func setDocPaths(doc map[string]json.RawMessage, newPaths map[string]map[string]json.RawMessage) error {
+	b, err := json.Marshal(newPaths)
+	if err != nil {
+		return err
+	}
+	doc[swaggerPathsKey] = b
+	return nil
+}
+
+func getDocDefs(doc map[string]json.RawMessage) (map[string]json.RawMessage, error) {
+	rawDefs, ok := doc[swaggerDefinitionsKey]
+	if !ok {
+		return nil, nil
+	}
+	var defs map[string]json.RawMessage
+	if err := json.Unmarshal(rawDefs, &defs); err != nil {
+		return nil, err
+	}
+	return defs, nil
+}
+
+func setDocDefs(doc map[string]json.RawMessage, newDefs map[string]json.RawMessage) error {
+	b, err := json.Marshal(newDefs)
+	if err != nil {
+		return err
+	}
+	doc[swaggerDefinitionsKey] = b
+	return nil
 }
 
 func getNewDefinitions(oldDefs map[string]json.RawMessage, allowedRefs map[string]struct{}) map[string]json.RawMessage {
