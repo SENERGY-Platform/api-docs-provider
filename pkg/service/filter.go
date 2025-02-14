@@ -50,18 +50,9 @@ func (s *Service) filterDoc(ctx context.Context, doc map[string]json.RawMessage,
 }
 
 func (s *Service) getNewPathsByToken(ctx context.Context, oldPaths map[string]map[string]json.RawMessage, basePath string, userToken string) (map[string]map[string]json.RawMessage, map[string]struct{}, error) {
-	pathMethodMap := make(map[string][]string)
-	for subPath, methods := range oldPaths {
-		fullPath := path.Join(basePath, subPath)
-		for method := range methods {
-			sl := pathMethodMap[fullPath]
-			sl = append(sl, method)
-			pathMethodMap[fullPath] = sl
-		}
-	}
 	ctxWt, cf := context.WithTimeout(ctx, s.timeout)
 	defer cf()
-	accessPolicies, err := s.ladonClt.GetUserAccessPolicy(ctxWt, userToken, pathMethodMap)
+	accessPolicies, err := s.ladonClt.GetUserAccessPolicy(ctxWt, userToken, getPathMethodsMap(oldPaths, basePath))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -186,4 +177,17 @@ func getDefinitionRefs(raw []byte, refs map[string]struct{}) {
 			refs[string(re[1])] = struct{}{}
 		}
 	}
+}
+
+func getPathMethodsMap(oldPaths map[string]map[string]json.RawMessage, basePath string) map[string][]string {
+	pathMethodsMap := make(map[string][]string)
+	for subPath, methods := range oldPaths {
+		fullPath := path.Join(basePath, subPath)
+		for method := range methods {
+			sl := pathMethodsMap[fullPath]
+			sl = append(sl, method)
+			pathMethodsMap[fullPath] = sl
+		}
+	}
+	return pathMethodsMap
 }
