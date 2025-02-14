@@ -8,6 +8,103 @@ import (
 	"testing"
 )
 
+func TestService_getNewPathsByRoles(t *testing.T) {
+	ladonClt := &ladonCltMock{}
+	srv := New(nil, nil, nil, nil, ladonClt, 0, "", "")
+	f, err := os.Open("test/swagger.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	var doc map[string]json.RawMessage
+	if err = json.NewDecoder(f).Decode(&doc); err != nil {
+		t.Fatal(err)
+	}
+	oldPaths, err := getDocPaths(doc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Run("full", func(t *testing.T) {
+		ladonClt.RolePolicies = map[string]map[string]struct{}{
+			"/a": {"get": struct{}{}, "post": struct{}{}},
+			"/b": {"get": struct{}{}},
+		}
+		newPaths, allowedRefs, err := srv.getNewPathsByRoles(context.Background(), oldPaths, "", []string{"test"})
+		if err != nil {
+			t.Error(err)
+		}
+		if len(newPaths) != 2 {
+			t.Errorf("expected 2 paths, got %d", len(newPaths))
+		}
+		for p, methods := range map[string][]string{
+			"/a": {"get", "post"},
+			"/b": {"get"},
+		} {
+			methods2, ok := newPaths[p]
+			if !ok {
+				t.Errorf("missing path '%s'", p)
+			}
+			if len(methods2) != len(methods) {
+				t.Errorf("expected %d methods, got %d", len(methods), len(methods2))
+			}
+			for _, method := range methods {
+				if _, ok := methods2[method]; !ok {
+					t.Errorf("missing method '%s'", method)
+				}
+			}
+		}
+		if len(allowedRefs) != 3 {
+			t.Errorf("expected 3 references, got %d", len(newPaths))
+		}
+		for _, s := range []string{"A", "B", "C"} {
+			if _, ok := allowedRefs[s]; !ok {
+				t.Errorf("missing reference '%s'", s)
+			}
+		}
+	})
+	t.Run("partial", func(t *testing.T) {
+		ladonClt.RolePolicies = map[string]map[string]struct{}{
+			"/a": {"get": struct{}{}},
+		}
+		newPaths, allowedRefs, err := srv.getNewPathsByRoles(context.Background(), oldPaths, "", []string{"test"})
+		if err != nil {
+			t.Error(err)
+		}
+		if len(newPaths) != 1 {
+			t.Errorf("expected 1 path, got %d", len(newPaths))
+		}
+		methods, ok := newPaths["/a"]
+		if !ok {
+			t.Error("missing path '/a'")
+		}
+		if len(methods) != 1 {
+			t.Errorf("expected 1 method, got %d", len(methods))
+		}
+		if _, ok = methods["get"]; !ok {
+			t.Error("missing method 'get'")
+		}
+		if len(allowedRefs) != 1 {
+			t.Errorf("expected 1 reference, got %d", len(newPaths))
+		}
+		if _, ok := allowedRefs["A"]; !ok {
+			t.Error("missing reference 'A'")
+		}
+	})
+	t.Run("none", func(t *testing.T) {
+		ladonClt.RolePolicies = map[string]map[string]struct{}{}
+		newPaths, allowedRefs, err := srv.getNewPathsByRoles(context.Background(), oldPaths, "", []string{"test"})
+		if err != nil {
+			t.Error(err)
+		}
+		if len(newPaths) != 0 {
+			t.Errorf("expected 0 paths, got %d", len(newPaths))
+		}
+		if len(allowedRefs) != 0 {
+			t.Errorf("expected 0 references, got %d", len(newPaths))
+		}
+	})
+}
+
 func TestService_getNewPathsByToken(t *testing.T) {
 	ladonClt := &ladonCltMock{}
 	srv := New(nil, nil, nil, nil, ladonClt, 0, "", "")
