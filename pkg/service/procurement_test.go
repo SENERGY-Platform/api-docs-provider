@@ -171,7 +171,7 @@ func Test_validateDoc(t *testing.T) {
 	})
 }
 
-func Test_cleanOldServices(t *testing.T) {
+func TestService_cleanOldServices(t *testing.T) {
 	sHdl := &storageHdlMock{
 		Items: map[string]struct {
 			models.StorageData
