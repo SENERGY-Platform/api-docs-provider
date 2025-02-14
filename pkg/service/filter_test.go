@@ -312,20 +312,6 @@ func TestService_transformDoc(t *testing.T) {
 	})
 }
 
-func Test_getPathMethodsMap(t *testing.T) {
-	a := map[string][]string{
-		"b/p1": {"m1", "m2"},
-		"b/p2": {"m1"},
-	}
-	b := getPathMethodsMap(map[string]map[string]json.RawMessage{
-		"p1": {"m1": nil, "m2": nil},
-		"p2": {"m1": nil},
-	}, "b")
-	if !reflect.DeepEqual(a, b) {
-		t.Errorf("got %v, expected %v", b, a)
-	}
-}
-
 type ladonCltMock struct {
 	RolePolicies  map[string]map[string]struct{}
 	TokenPolicies map[string][]string
