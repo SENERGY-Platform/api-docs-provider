@@ -7,6 +7,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// New godoc
+// @title Swagger-Docs-Provider API
+// @version 0.5.2
+// @description Provides swagger docs and storage management.
+// @license.name Apache-2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @BasePath /
 func New(srv Service, staticHeader map[string]string) (*gin.Engine, error) {
 	gin.SetMode(gin.ReleaseMode)
 	httpHandler := gin.New()

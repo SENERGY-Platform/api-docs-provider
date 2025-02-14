@@ -7,11 +7,12 @@ import (
 )
 
 var routes = gin_mw.Routes[Service]{
-	GetSwaggerDocsH,
-	PatchStorageRefreshH,
-	GetStorageListH,
-	GetInfoH,
-	GetHealthCheckH,
+	getSwaggerDocsH,
+	patchStorageRefreshH,
+	getStorageListH,
+	getInfoH,
+	getHealthCheckH,
+	getSwaggerDocH,
 }
 
 func SetRoutes(e *gin.Engine, srv Service) error {
