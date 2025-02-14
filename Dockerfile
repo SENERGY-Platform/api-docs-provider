@@ -12,6 +12,7 @@ FROM alpine:3.20
 RUN mkdir -p /opt/swagger-docs-provider
 WORKDIR /opt/swagger-docs-provider
 COPY --from=builder /go/src/app/bin bin
+COPY --from=builder /go/src/app/docs docs
 
 HEALTHCHECK --interval=10s --timeout=5s --retries=3 CMD wget -nv -t1 --spider 'http://localhost/health-check' || exit 1
 
