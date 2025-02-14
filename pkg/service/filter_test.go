@@ -8,6 +8,42 @@ import (
 	"testing"
 )
 
+func TestService_filterDoc(t *testing.T) {
+	f, err := os.Open("test/swagger.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	var doc map[string]json.RawMessage
+	if err = json.NewDecoder(f).Decode(&doc); err != nil {
+		t.Fatal(err)
+	}
+	ladonClt := &ladonCltMock{}
+	srv := New(nil, nil, nil, nil, ladonClt, 0, "", "")
+	t.Run("include", func(t *testing.T) {
+		ladonClt.TokenPolicies = map[string][]string{
+			"/a": {"get"},
+		}
+		ok, err := srv.filterDoc(context.Background(), doc, "test", nil, "")
+		if err != nil {
+			t.Error(err)
+		}
+		if !ok {
+			t.Error("expected true")
+		}
+	})
+	t.Run("exclude", func(t *testing.T) {
+		ladonClt.TokenPolicies = map[string][]string{}
+		ok, err := srv.filterDoc(context.Background(), doc, "test", nil, "")
+		if err != nil {
+			t.Error(err)
+		}
+		if ok {
+			t.Error("expected false")
+		}
+	})
+}
+
 func Test_getNewDefinitions(t *testing.T) {
 	f, err := os.Open("test/swagger.json")
 	if err != nil {
