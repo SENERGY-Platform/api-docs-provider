@@ -1,12 +1,111 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
+	"os"
 	"reflect"
 	"testing"
 )
 
-func Test_transformDoc(t *testing.T) {
+func TestService_getNewPathsByToken(t *testing.T) {
+	ladonClt := &ladonCltMock{}
+	srv := New(nil, nil, nil, nil, ladonClt, 0, "", "")
+	f, err := os.Open("test/swagger.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	var doc map[string]json.RawMessage
+	if err = json.NewDecoder(f).Decode(&doc); err != nil {
+		t.Fatal(err)
+	}
+	oldPaths, err := getDocPaths(doc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Run("full", func(t *testing.T) {
+		ladonClt.TokenPolicies = map[string][]string{
+			"/a": {"get", "post"},
+			"/b": {"get"},
+		}
+		newPaths, allowedRefs, err := srv.getNewPathsByToken(context.Background(), oldPaths, "", "")
+		if err != nil {
+			t.Error(err)
+		}
+		if len(newPaths) != 2 {
+			t.Errorf("expected 2 paths, got %d", len(newPaths))
+		}
+		for p, methods := range map[string][]string{
+			"/a": {"get", "post"},
+			"/b": {"get"},
+		} {
+			methods2, ok := newPaths[p]
+			if !ok {
+				t.Errorf("missing path '%s'", p)
+			}
+			if len(methods2) != len(methods) {
+				t.Errorf("expected %d methods, got %d", len(methods), len(methods2))
+			}
+			for _, method := range methods {
+				if _, ok := methods2[method]; !ok {
+					t.Errorf("missing method '%s'", method)
+				}
+			}
+		}
+		if len(allowedRefs) != 3 {
+			t.Errorf("expected 3 references, got %d", len(newPaths))
+		}
+		for _, s := range []string{"A", "B", "C"} {
+			if _, ok := allowedRefs[s]; !ok {
+				t.Errorf("missing reference '%s'", s)
+			}
+		}
+	})
+	t.Run("partial", func(t *testing.T) {
+		ladonClt.TokenPolicies = map[string][]string{
+			"/a": {"get"},
+		}
+		newPaths, allowedRefs, err := srv.getNewPathsByToken(context.Background(), oldPaths, "", "")
+		if err != nil {
+			t.Error(err)
+		}
+		if len(newPaths) != 1 {
+			t.Errorf("expected 1 path, got %d", len(newPaths))
+		}
+		methods, ok := newPaths["/a"]
+		if !ok {
+			t.Error("missing path '/a'")
+		}
+		if len(methods) != 1 {
+			t.Errorf("expected 1 method, got %d", len(methods))
+		}
+		if _, ok = methods["get"]; !ok {
+			t.Error("missing method 'get'")
+		}
+		if len(allowedRefs) != 1 {
+			t.Errorf("expected 1 reference, got %d", len(newPaths))
+		}
+		if _, ok := allowedRefs["A"]; !ok {
+			t.Error("missing reference 'A'")
+		}
+	})
+	t.Run("none", func(t *testing.T) {
+		ladonClt.TokenPolicies = map[string][]string{}
+		newPaths, allowedRefs, err := srv.getNewPathsByToken(context.Background(), oldPaths, "", "")
+		if err != nil {
+			t.Error(err)
+		}
+		if len(newPaths) != 0 {
+			t.Errorf("expected 0 paths, got %d", len(newPaths))
+		}
+		if len(allowedRefs) != 0 {
+			t.Errorf("expected 0 references, got %d", len(newPaths))
+		}
+	})
+}
+
+func TestService_transformDoc(t *testing.T) {
 	orgDoc := []byte("{\"host\": \"org\", \"basePath\": \"org\", \"schemes\": [\"http\"]}")
 	srv := New(nil, nil, nil, nil, nil, 0, "test", "")
 	aRaw := []byte("{\"host\": \"test\", \"basePath\": \"test\", \"schemes\": [\"http\"]}")
@@ -36,4 +135,43 @@ func Test_transformDoc(t *testing.T) {
 			t.Errorf("got %v, expected %v", b, a)
 		}
 	})
+}
+
+func Test_getPathMethodsMap(t *testing.T) {
+	a := map[string][]string{
+		"b/p1": {"m1", "m2"},
+		"b/p2": {"m1"},
+	}
+	b := getPathMethodsMap(map[string]map[string]json.RawMessage{
+		"p1": {"m1": nil, "m2": nil},
+		"p2": {"m1": nil},
+	}, "b")
+	if !reflect.DeepEqual(a, b) {
+		t.Errorf("got %v, expected %v", b, a)
+	}
+}
+
+type ladonCltMock struct {
+	RolePolicies  map[string]map[string]struct{}
+	TokenPolicies map[string][]string
+	Err           error
+}
+
+func (m *ladonCltMock) GetRoleAccessPolicy(_ context.Context, _, path, method string) (bool, error) {
+	if m.Err != nil {
+		return false, m.Err
+	}
+	methods, ok := m.RolePolicies[path]
+	if !ok {
+		return false, nil
+	}
+	_, ok = methods[method]
+	return ok, nil
+}
+
+func (m *ladonCltMock) GetUserAccessPolicy(_ context.Context, _ string, _ map[string][]string) (map[string][]string, error) {
+	if m.Err != nil {
+		return nil, m.Err
+	}
+	return m.TokenPolicies, nil
 }

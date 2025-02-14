@@ -1,0 +1,158 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Test Swagger",
+    "title": "Test",
+    "contact": {},
+    "license": {
+      "name": "test",
+      "url": "test"
+    },
+    "version": "v1"
+  },
+  "basePath": "/",
+  "paths": {
+    "/a": {
+      "get": {
+        "description": "test",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "test"
+        ],
+        "summary": "test",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "test",
+            "name": "test",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "test",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/A"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "test",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "text/plain"
+        ],
+        "tags": [
+          "test"
+        ],
+        "summary": "test",
+        "parameters": [
+          {
+            "description": "test",
+            "name": "test",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/B"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "test",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/b": {
+      "get": {
+        "description": "test",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "test"
+        ],
+        "summary": "test",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "test",
+            "name": "test",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "test",
+            "schema": {
+              "$ref": "#/definitions/C"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "A": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "login": {
+          "type": "string"
+        },
+        "secret": {
+          "type": "string"
+        }
+      }
+    },
+    "B": {
+      "type": "object",
+      "properties": {
+        "a": {
+          "type": "string"
+        },
+        "b": {
+          "$ref": "#/definitions/D"
+        }
+      }
+    },
+    "C": {
+      "type": "object",
+      "properties": {
+        "a": {
+          "type": "object",
+          "additionalProperties": {}
+        },
+        "b": {
+          "type": "string"
+        }
+      }
+    },
+    "D": {
+      "type": "string",
+      "enum": [
+        "human",
+        "machine"
+      ],
+      "x-enum-varnames": [
+        "HumanType",
+        "MachineType"
+      ]
+    }
+  }
+}
