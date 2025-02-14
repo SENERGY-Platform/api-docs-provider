@@ -9,7 +9,7 @@ import (
 
 // New godoc
 // @title Swagger-Docs-Provider API
-// @version 0.5.3
+// @version 0.5.4
 // @description Provides swagger docs and storage management.
 // @license.name Apache-2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
