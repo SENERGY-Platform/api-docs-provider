@@ -95,11 +95,13 @@ func (s *Service) handleService(ctx context.Context, wg *sync.WaitGroup, service
 	defer wg.Done()
 	ctxWt, cf := context.WithTimeout(ctx, s.timeout)
 	defer cf()
+	reqID := util.GetReqID(ctx)
+	util.Logger.Debugf("service: %sprobing '%s:%d' for doc", reqID, service.Host, service.Port)
 	doc, err := s.docClt.GetDoc(ctxWt, service.Protocol, service.Host, service.Port)
 	if err != nil {
+		util.Logger.Debugf("service: %sprobing '%s:%d' for doc failed: %s", reqID, service.Host, service.Port, err)
 		return
 	}
-	reqID := util.GetReqID(ctx)
 	if err = validateDoc(doc); err != nil {
 		util.Logger.Warningf("service: %svalidating doc for '%s:%d' failed: %s", reqID, service.Host, service.Port, err)
 		return
