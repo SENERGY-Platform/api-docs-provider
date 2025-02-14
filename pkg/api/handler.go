@@ -7,6 +7,7 @@ import (
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -99,7 +100,11 @@ func getHealthCheckH(srv Service) (string, string, gin.HandlerFunc) {
 
 func getSwaggerDocH(_ Service) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, "/doc", func(gc *gin.Context) {
+		if _, err := os.Stat("docs/swagger.json"); err != nil {
+			_ = gc.Error(err)
+			return
+		}
 		gc.Header("Content-Type", gin.MIMEJSON)
-		gc.File("../../docs/swagger.json")
+		gc.File("docs/swagger.json")
 	}
 }
