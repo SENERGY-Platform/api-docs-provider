@@ -60,10 +60,12 @@ func (h *Handler) GetServices(ctx context.Context) (map[string]models.Service, e
 			service.Host = kService.Host
 			service.Port = kService.Port
 			service.Protocol = kService.Protocol
-			util.Logger.Debugf("discovery: found service host='%s' port=%d", service.Host, service.Port)
 		}
 		service.ExtPaths = append(service.ExtPaths, kRoute.Paths...)
 		services[id] = service
+	}
+	for _, service := range services {
+		util.Logger.Debugf("discovery: found service host='%s' port=%d for %v", service.Host, service.Port, service.ExtPaths)
 	}
 	return services, nil
 }
