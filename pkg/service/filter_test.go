@@ -8,6 +8,48 @@ import (
 	"testing"
 )
 
+func Test_getNewDefinitions(t *testing.T) {
+	f, err := os.Open("test/swagger.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	var doc map[string]json.RawMessage
+	if err = json.NewDecoder(f).Decode(&doc); err != nil {
+		t.Fatal(err)
+	}
+	oldDefs, err := getDocDefs(doc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Run("full", func(t *testing.T) {
+		newDefs := getNewDefinitions(oldDefs, map[string]struct{}{"A": {}, "B": {}, "C": {}})
+		if len(newDefs) != len(oldDefs) {
+			t.Errorf("expected %d definitions, got %d", len(oldDefs), len(newDefs))
+		}
+		for key := range oldDefs {
+			if _, ok := newDefs[key]; !ok {
+				t.Errorf("missing definition '%s'", key)
+			}
+		}
+	})
+	t.Run("partial", func(t *testing.T) {
+		newDefs := getNewDefinitions(oldDefs, map[string]struct{}{"A": {}})
+		if len(newDefs) != 1 {
+			t.Errorf("expected 1 definition, got %d", len(newDefs))
+		}
+		if _, ok := newDefs["A"]; !ok {
+			t.Error("expected definition 'A'")
+		}
+	})
+	t.Run("none", func(t *testing.T) {
+		newDefs := getNewDefinitions(oldDefs, map[string]struct{}{})
+		if len(newDefs) != 0 {
+			t.Errorf("expected 0 definitions, got %d", len(newDefs))
+		}
+	})
+}
+
 func TestService_getNewPathsByRoles(t *testing.T) {
 	ladonClt := &ladonCltMock{}
 	srv := New(nil, nil, nil, nil, ladonClt, 0, "", "")
