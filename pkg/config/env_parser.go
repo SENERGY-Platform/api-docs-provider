@@ -1,7 +1,6 @@
 package config
 
 import (
-	envldr "github.com/SENERGY-Platform/go-env-loader"
 	config_hdl "github.com/SENERGY-Platform/go-service-base/config-hdl"
 	config_env_parser "github.com/SENERGY-Platform/go-service-base/config-hdl/env_parser"
 	config_types "github.com/SENERGY-Platform/go-service-base/config-hdl/types"
@@ -18,11 +17,11 @@ var envTypeParser = []config_hdl.EnvTypeParser{
 	listEnvTypeParser,
 }
 
-func logLevelEnvTypeParser() (reflect.Type, envldr.Parser) {
+func logLevelEnvTypeParser() (reflect.Type, config_hdl.EnvParser) {
 	return reflect.TypeOf(level.Off), sb_logger.LevelParser
 }
 
-func listEnvTypeParser() (reflect.Type, envldr.Parser) {
+func listEnvTypeParser() (reflect.Type, config_hdl.EnvParser) {
 	return reflect.TypeOf([]string{}), listEnvParser
 }
 
