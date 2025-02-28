@@ -2,18 +2,10 @@ package config
 
 import (
 	config_hdl "github.com/SENERGY-Platform/go-service-base/config-hdl"
-	config_env_parser "github.com/SENERGY-Platform/go-service-base/config-hdl/env_parser"
 	config_types "github.com/SENERGY-Platform/go-service-base/config-hdl/types"
 	"github.com/y-du/go-log-level/level"
 	"time"
 )
-
-var envTypeParser = []config_hdl.EnvTypeParser{
-	config_types.SecretEnvTypeParser,
-	config_env_parser.DurationEnvTypeParser,
-	logLevelEnvTypeParser,
-	listEnvTypeParser,
-}
 
 type LoggerConfig struct {
 	Level        level.Level `json:"level" env_var:"LOGGER_LEVEL"`
