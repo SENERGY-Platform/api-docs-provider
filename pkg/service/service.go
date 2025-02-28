@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 	"encoding/json"
-	srv_info_hdl "github.com/SENERGY-Platform/go-service-base/srv-info-hdl"
-	srv_info_lib "github.com/SENERGY-Platform/go-service-base/srv-info-hdl/lib"
+	srv_info_hdl "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl"
+	srv_info_lib "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl/lib"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/doc_clt"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/ladon_clt"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"

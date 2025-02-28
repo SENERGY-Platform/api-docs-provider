@@ -5,12 +5,11 @@ go 1.23
 require (
 	github.com/SENERGY-Platform/gin-middleware v0.5.1
 	github.com/SENERGY-Platform/go-base-http-client v0.1.0
-	github.com/SENERGY-Platform/go-env-loader v0.5.3
 	github.com/SENERGY-Platform/go-service-base/config-hdl v1.1.0
 	github.com/SENERGY-Platform/go-service-base/logger v0.2.0
-	github.com/SENERGY-Platform/go-service-base/srv-info-hdl v0.0.3
-	github.com/SENERGY-Platform/go-service-base/srv-info-hdl/lib v0.0.2
-	github.com/SENERGY-Platform/go-service-base/util v1.1.0
+	github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl v0.0.4
+	github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl/lib v0.0.3
+	github.com/SENERGY-Platform/mgw-go-service-base/util v1.1.1
 	github.com/gin-contrib/requestid v1.0.4
 	github.com/gin-gonic/gin v1.10.0
 	github.com/google/uuid v1.6.0
@@ -18,6 +17,7 @@ require (
 )
 
 require (
+	github.com/SENERGY-Platform/go-env-loader v0.5.3 // indirect
 	github.com/bytedance/sonic v1.12.7 // indirect
 	github.com/bytedance/sonic/loader v0.2.2 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect

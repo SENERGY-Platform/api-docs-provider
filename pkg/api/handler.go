@@ -2,7 +2,7 @@ package api
 
 import (
 	"context"
-	_ "github.com/SENERGY-Platform/go-service-base/srv-info-hdl/lib"
+	_ "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl/lib"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
