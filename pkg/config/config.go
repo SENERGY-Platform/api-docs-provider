@@ -64,6 +64,6 @@ func New(path string) (*Config, error) {
 		},
 		HttpTimeout: time.Second * 30,
 	}
-	err := config_hdl.Load(&cfg, nil, typeParser, nil, path)
+	err := config_hdl.Load(&cfg, nil, envTypeParser, nil, path)
 	return &cfg, err
 }
