@@ -6,7 +6,7 @@ require (
 	github.com/SENERGY-Platform/gin-middleware v0.5.1
 	github.com/SENERGY-Platform/go-base-http-client v0.1.0
 	github.com/SENERGY-Platform/go-service-base/config-hdl v1.1.0
-	github.com/SENERGY-Platform/go-service-base/logger v0.2.0
+	github.com/SENERGY-Platform/go-service-base/logger v1.0.0
 	github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl v0.0.4
 	github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl/lib v0.0.3
 	github.com/SENERGY-Platform/mgw-go-service-base/util v1.1.1

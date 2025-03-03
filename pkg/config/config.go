@@ -1,8 +1,8 @@
 package config
 
 import (
-	config_hdl "github.com/SENERGY-Platform/go-service-base/config-hdl"
-	config_types "github.com/SENERGY-Platform/go-service-base/config-hdl/types"
+	sb_config_hdl "github.com/SENERGY-Platform/go-service-base/config-hdl"
+	sb_config_types "github.com/SENERGY-Platform/go-service-base/config-hdl/types"
 	"github.com/y-du/go-log-level/level"
 	"time"
 )
@@ -18,9 +18,9 @@ type LoggerConfig struct {
 }
 
 type KongConfig struct {
-	User     string              `json:"user" env_var:"KONG_USER"`
-	Password config_types.Secret `json:"password" env_var:"KONG_PASSWORD"`
-	BaseURL  string              `json:"base_url" env_var:"KONG_BASE_URL"`
+	User     string                 `json:"user" env_var:"KONG_USER"`
+	Password sb_config_types.Secret `json:"password" env_var:"KONG_PASSWORD"`
+	BaseURL  string                 `json:"base_url" env_var:"KONG_BASE_URL"`
 }
 
 type ProcurementConfig struct {
@@ -64,6 +64,6 @@ func New(path string) (*Config, error) {
 		},
 		HttpTimeout: time.Second * 30,
 	}
-	err := config_hdl.Load(&cfg, nil, envTypeParser, nil, path)
+	err := sb_config_hdl.Load(&cfg, nil, envTypeParser, nil, path)
 	return &cfg, err
 }

@@ -6,8 +6,8 @@ github.com/SENERGY-Platform/go-env-loader v0.5.3 h1:sNM/psxYBs3DeDCw8P8gWM2hvySi
 github.com/SENERGY-Platform/go-env-loader v0.5.3/go.mod h1:vdEOp4x1VIzmCR+5u/4/GmO8bUOkYsP6NQaLy/46AVE=
 github.com/SENERGY-Platform/go-service-base/config-hdl v1.1.0 h1:S6HwyBKNaQIz0nZgcFkd3X6iQCR3914JVyDwoCsBHDc=
 github.com/SENERGY-Platform/go-service-base/config-hdl v1.1.0/go.mod h1:+YKSlnOc5NNeZuVA5HE8hmrKCRQwb5FlMvgmpMw2FWk=
-github.com/SENERGY-Platform/go-service-base/logger v0.2.0 h1:O8aGx+JJVyV6AxfcxIVHH6lyXeRMleui6L9J9JEI3vM=
-github.com/SENERGY-Platform/go-service-base/logger v0.2.0/go.mod h1:4g66GXZ3LBa0XSB2eSdDJtqLkm2xuju4qzc77Cf2Nhc=
+github.com/SENERGY-Platform/go-service-base/logger v1.0.0 h1:xGGTVThbSxd/FzrAsPyIDTml/N8ja1LIBd7KmpzMI1A=
+github.com/SENERGY-Platform/go-service-base/logger v1.0.0/go.mod h1:4g66GXZ3LBa0XSB2eSdDJtqLkm2xuju4qzc77Cf2Nhc=
 github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl v0.0.4 h1:8ozGX5zgkMLpk9ReGGCBITLeFFYI7w3EjVAsVpX5i5U=
 github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl v0.0.4/go.mod h1:tawRXrwQh66Y+Yy89K85B5Iz/pdX8oGGbJvfOvuICG8=
 github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl/lib v0.0.3 h1:+yoS/vw24gobIpqKp/m1x/riO//Hh2Cp03VXlFuToK8=
