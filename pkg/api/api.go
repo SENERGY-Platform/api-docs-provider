@@ -21,7 +21,7 @@ func New(srv Service, staticHeader map[string]string) (*gin.Engine, error) {
 		return requestid.Get(gc)
 	}), gin_mw.ErrorHandler(GetStatusCode, ", "), gin.Recovery())
 	httpHandler.UseRawPath = true
-	err := SetRoutes(httpHandler, srv)
+	err := routes.Set(srv, httpHandler, util.Logger)
 	if err != nil {
 		return nil, err
 	}
