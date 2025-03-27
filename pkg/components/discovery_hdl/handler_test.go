@@ -19,8 +19,8 @@ package discovery_hdl
 import (
 	"context"
 	"errors"
+	"github.com/SENERGY-Platform/go-service-base/struct-logger"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/kong_clt"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/config"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
 	"os"
@@ -85,7 +85,7 @@ func TestHandler_GetServices(t *testing.T) {
 			},
 		},
 	}
-	util.InitLogger(config.LoggerConfig{}, os.Stderr, "", "")
+	util.InitLogger(struct_logger.Config{}, os.Stderr, "", "")
 	InitLogger()
 	hdl := New(mockClt, 0, []string{"api.srv-c"})
 	a := map[string]models.Service{

@@ -17,32 +17,13 @@
 package util
 
 import (
-	"github.com/SENERGY-Platform/go-service-base/structured-logger"
-	"github.com/SENERGY-Platform/go-service-base/structured-logger/attributes"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/config"
+	"github.com/SENERGY-Platform/go-service-base/struct-logger"
 	"io"
 	"log/slog"
 )
 
 var Logger *slog.Logger
 
-func InitLogger(c config.LoggerConfig, out io.Writer, organization, project string) {
-	recordTime := structured_logger.NewRecordTime(c.TimeFormat, c.TimeUtc)
-	options := &slog.HandlerOptions{
-		AddSource:   c.AddSource,
-		Level:       structured_logger.GetLevel(c.Level, slog.LevelInfo),
-		ReplaceAttr: recordTime.ReplaceAttr,
-	}
-	handler := structured_logger.GetHandler(c.Handler, out, options, slog.Default().Handler())
-	var attr []slog.Attr
-	if c.AddMeta {
-		if organization != "" {
-			attr = append(attr, slog.String(attributes.OrganizationKey, organization))
-		}
-		if project != "" {
-			attr = append(attr, slog.String(attributes.ProjectKey, project))
-		}
-	}
-	handler = handler.WithAttrs(attr)
-	Logger = slog.New(handler)
+func InitLogger(c struct_logger.Config, out io.Writer, organization, project string) {
+	Logger = struct_logger.New(c, out, organization, project)
 }

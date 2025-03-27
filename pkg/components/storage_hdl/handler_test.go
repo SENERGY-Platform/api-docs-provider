@@ -18,7 +18,7 @@ package storage_hdl
 
 import (
 	"context"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/config"
+	"github.com/SENERGY-Platform/go-service-base/struct-logger"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
 	"os"
@@ -27,7 +27,7 @@ import (
 )
 
 func TestHandler(t *testing.T) {
-	util.InitLogger(config.LoggerConfig{}, os.Stderr, "", "")
+	util.InitLogger(struct_logger.Config{}, os.Stderr, "", "")
 	InitLogger()
 	tmpDir := t.TempDir()
 	hdl := New(tmpDir)

@@ -19,7 +19,7 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"github.com/SENERGY-Platform/go-service-base/structured-logger/attributes"
+	"github.com/SENERGY-Platform/go-service-base/struct-logger/attributes"
 	srv_info_hdl "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl"
 	srv_info_lib "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl/lib"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/doc_clt"

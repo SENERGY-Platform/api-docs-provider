@@ -21,7 +21,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/config"
+	"github.com/SENERGY-Platform/go-service-base/struct-logger"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
 	"os"
@@ -105,7 +105,7 @@ func TestService_RefreshStorage(t *testing.T) {
 			},
 		},
 	}
-	util.InitLogger(config.LoggerConfig{}, os.Stderr, "", "")
+	util.InitLogger(struct_logger.Config{}, os.Stderr, "", "")
 	InitLogger()
 	srv := New(storageHdl, discoveryHdl, nil, docClt, nil, 0, "", "")
 	err = srv.RefreshStorage(context.Background())

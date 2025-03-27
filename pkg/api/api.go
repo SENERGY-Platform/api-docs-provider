@@ -18,7 +18,7 @@ package api
 
 import (
 	gin_mw "github.com/SENERGY-Platform/gin-middleware"
-	"github.com/SENERGY-Platform/go-service-base/structured-logger/attributes"
+	"github.com/SENERGY-Platform/go-service-base/struct-logger/attributes"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util/slog_attr"
 	"github.com/gin-contrib/requestid"
@@ -39,7 +39,7 @@ func New(srv Service, staticHeader map[string]string, accessLog bool) (*gin.Engi
 	if accessLog {
 		middleware = append(
 			middleware,
-			gin_mw.StructuredLoggerHandler(
+			gin_mw.StructLoggerHandler(
 				util.Logger.With(attributes.LogRecordTypeKey, attributes.HttpAccessLogRecordTypeVal),
 				attributes.Provider,
 				[]string{HealthCheckPath},
@@ -52,7 +52,7 @@ func New(srv Service, staticHeader map[string]string, accessLog bool) (*gin.Engi
 		gin_mw.StaticHeaderHandler(staticHeader),
 		requestid.New(requestid.WithCustomHeaderStrKey(HeaderRequestID)),
 		gin_mw.ErrorHandler(GetStatusCode, ", "),
-		gin_mw.StructuredRecoveryHandler(util.Logger, gin_mw.DefaultRecoveryFunc),
+		gin_mw.StructRecoveryHandler(util.Logger, gin_mw.DefaultRecoveryFunc),
 	)
 	httpHandler.Use(middleware...)
 	httpHandler.UseRawPath = true

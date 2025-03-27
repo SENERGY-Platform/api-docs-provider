@@ -1,12 +1,12 @@
 module github.com/SENERGY-Platform/swagger-docs-provider
 
-go 1.24
+go 1.24.1
 
 require (
-	github.com/SENERGY-Platform/gin-middleware v0.8.2
+	github.com/SENERGY-Platform/gin-middleware v0.9.0
 	github.com/SENERGY-Platform/go-base-http-client v0.1.0
 	github.com/SENERGY-Platform/go-service-base/config-hdl v1.1.0
-	github.com/SENERGY-Platform/go-service-base/structured-logger v0.3.2
+	github.com/SENERGY-Platform/go-service-base/struct-logger v0.4.1
 	github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl v0.0.4
 	github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl/lib v0.0.3
 	github.com/SENERGY-Platform/mgw-go-service-base/util v1.1.1

@@ -19,7 +19,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/SENERGY-Platform/go-service-base/structured-logger/attributes"
+	"github.com/SENERGY-Platform/go-service-base/struct-logger/attributes"
 	srv_info_hdl "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl"
 	sb_util "github.com/SENERGY-Platform/mgw-go-service-base/util"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/api"
