@@ -21,12 +21,14 @@ import (
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/config"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
+	"os"
 	"reflect"
 	"testing"
 )
 
 func TestHandler(t *testing.T) {
-	util.InitLogger(config.LoggerConfig{Level: 4, Terminal: true})
+	util.InitLogger(config.LoggerConfig{}, os.Stderr, "", "")
+	InitLogger()
 	tmpDir := t.TempDir()
 	hdl := New(tmpDir)
 	t.Run("write 1", func(t *testing.T) {

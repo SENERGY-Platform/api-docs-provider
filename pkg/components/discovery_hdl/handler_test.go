@@ -86,6 +86,7 @@ func TestHandler_GetServices(t *testing.T) {
 		},
 	}
 	util.InitLogger(config.LoggerConfig{}, os.Stderr, "", "")
+	InitLogger()
 	hdl := New(mockClt, 0, []string{"api.srv-c"})
 	a := map[string]models.Service{
 		"api.srv-a8000": {

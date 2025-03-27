@@ -106,6 +106,7 @@ func TestService_RefreshStorage(t *testing.T) {
 		},
 	}
 	util.InitLogger(config.LoggerConfig{}, os.Stderr, "", "")
+	InitLogger()
 	srv := New(storageHdl, discoveryHdl, nil, docClt, nil, 0, "", "")
 	err = srv.RefreshStorage(context.Background())
 	if err != nil {
