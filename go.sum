@@ -1,5 +1,5 @@
-github.com/SENERGY-Platform/gin-middleware v0.8.1 h1:jffAVAfNtQJ8ckLzQnEYvmtQv+N/w/aAw98rNtWQ8TA=
-github.com/SENERGY-Platform/gin-middleware v0.8.1/go.mod h1:txJcOsdkT3M/X1XucUaBjqkdBDlIB6A9tVUbV9SEsRE=
+github.com/SENERGY-Platform/gin-middleware v0.8.2 h1:u3Rg6sc08FJ1qv1Og+LegQ6TXU7auGRwI2Dpbz3U89Y=
+github.com/SENERGY-Platform/gin-middleware v0.8.2/go.mod h1:txJcOsdkT3M/X1XucUaBjqkdBDlIB6A9tVUbV9SEsRE=
 github.com/SENERGY-Platform/go-base-http-client v0.1.0 h1:PUiZVEj7/cMSZJ0g5G611tjY9bSh1Eby+tcktrgpiZ0=
 github.com/SENERGY-Platform/go-base-http-client v0.1.0/go.mod h1:NfKW/relIVTkMXhz4OqZlzJXYPQUYEKxwqou8D0B/Kw=
 github.com/SENERGY-Platform/go-env-loader v0.5.3 h1:sNM/psxYBs3DeDCw8P8gWM2hvySijwy9t2DdSGdhF1c=
