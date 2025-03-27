@@ -23,6 +23,7 @@ import (
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/config"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
+	"os"
 	"reflect"
 	"testing"
 )
@@ -84,7 +85,7 @@ func TestHandler_GetServices(t *testing.T) {
 			},
 		},
 	}
-	util.InitLogger(config.LoggerConfig{Level: 4, Terminal: true})
+	util.InitLogger(config.LoggerConfig{}, os.Stderr, "", "")
 	hdl := New(mockClt, 0, []string{"api.srv-c"})
 	a := map[string]models.Service{
 		"api.srv-a8000": {

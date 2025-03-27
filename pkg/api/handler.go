@@ -18,8 +18,10 @@ package api
 
 import (
 	"context"
+	"github.com/SENERGY-Platform/go-service-base/structured-logger/attributes"
 	_ "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl/lib"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
+	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -118,6 +120,7 @@ func getSwaggerDocH(_ Service) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, "/doc", func(gc *gin.Context) {
 		if _, err := os.Stat("docs/swagger.json"); err != nil {
 			_ = gc.Error(err)
+			util.Logger.Error("reading swagger file failed", attributes.ErrorKey, err)
 			return
 		}
 		gc.Header("Content-Type", gin.MIMEJSON)

@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/kong_clt"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
+	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util/slog_attr"
 	"time"
 )
 
@@ -81,7 +81,7 @@ func (h *Handler) GetServices(ctx context.Context) (map[string]models.Service, e
 		services[id] = service
 	}
 	for _, service := range services {
-		util.Logger.Debugf("discovery: found service host='%s' port=%d for %v", service.Host, service.Port, service.ExtPaths)
+		logger.Debug("found service", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, slog_attr.ExternalPathsKey, service.ExtPaths)
 	}
 	return services, nil
 }

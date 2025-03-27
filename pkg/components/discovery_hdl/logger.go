@@ -14,26 +14,16 @@
  * limitations under the License.
  */
 
-package util
+package discovery_hdl
 
 import (
-	"context"
+	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util/slog_attr"
-	"os"
-	"os/signal"
+	"log/slog"
 )
 
-func WaitForSignal(ctx context.Context, signals ...os.Signal) {
-	ch := make(chan os.Signal, 1)
-	for _, sig := range signals {
-		signal.Notify(ch, sig)
-	}
-	select {
-	case sig := <-ch:
-		Logger.Warn("caught os signal", slog_attr.NumberKey, sig.String())
-		break
-	case <-ctx.Done():
-		break
-	}
-	signal.Stop(ch)
+var logger *slog.Logger
+
+func InitLogger() {
+	logger = util.Logger.With(slog_attr.ComponentKey, "discovery-hdl")
 }

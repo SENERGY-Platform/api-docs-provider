@@ -19,18 +19,18 @@ package config
 import (
 	sb_config_hdl "github.com/SENERGY-Platform/go-service-base/config-hdl"
 	sb_config_types "github.com/SENERGY-Platform/go-service-base/config-hdl/types"
-	"github.com/y-du/go-log-level/level"
+	structured_logger "github.com/SENERGY-Platform/go-service-base/structured-logger"
 	"time"
 )
 
 type LoggerConfig struct {
-	Level        level.Level `json:"level" env_var:"LOGGER_LEVEL"`
-	Utc          bool        `json:"utc" env_var:"LOGGER_UTC"`
-	Path         string      `json:"path" env_var:"LOGGER_PATH"`
-	FileName     string      `json:"file_name" env_var:"LOGGER_FILE_NAME"`
-	Terminal     bool        `json:"terminal" env_var:"LOGGER_TERMINAL"`
-	Microseconds bool        `json:"microseconds" env_var:"LOGGER_MICROSECONDS"`
-	Prefix       string      `json:"prefix" env_var:"LOGGER_PREFIX"`
+	Handler    string `json:"handler" env_var:"LOGGER_HANDLER"`
+	Level      string `json:"level" env_var:"LOGGER_LEVEL"`
+	TimeFormat string `json:"time_format" env_var:"LOGGER_TIME_FORMAT"`
+	TimeUtc    bool   `json:"time_utc" env_var:"LOGGER_TIME_UTC"`
+	FilePath   string `json:"file_path" env_var:"LOGGER_FILE_PATH"`
+	AddSource  bool   `json:"add_source" env_var:"LOGGER_ADD_SOURCE"`
+	AddMeta    bool   `json:"add_meta" env_var:"LOGGER_ADD_META"`
 }
 
 type KongConfig struct {
@@ -55,24 +55,25 @@ type DiscoveryConfig struct {
 }
 
 type Config struct {
-	ServerPort  int               `json:"server_port" env_var:"SERVER_PORT"`
-	Logger      LoggerConfig      `json:"logger" env_var:"LOGGER_CONFIG"`
-	WorkdirPath string            `json:"workdir_path" env_var:"WORKDIR_PATH"`
-	ApiGateway  string            `json:"api_gateway" env_var:"API_GATEWAY"`
-	Discovery   DiscoveryConfig   `json:"discovery" env_var:"DISCOVERY_CONFIG"`
-	Procurement ProcurementConfig `json:"procurement" env_var:"PROCUREMENT_CONFIG"`
-	Filter      FilterConfig      `json:"filter" env_var:"FILTER_CONFIG"`
-	HttpTimeout time.Duration     `json:"http_timeout" env_var:"HTTP_TIMEOUT"`
+	ServerPort    int               `json:"server_port" env_var:"SERVER_PORT"`
+	Logger        LoggerConfig      `json:"logger" env_var:"LOGGER_CONFIG"`
+	WorkdirPath   string            `json:"workdir_path" env_var:"WORKDIR_PATH"`
+	ApiGateway    string            `json:"api_gateway" env_var:"API_GATEWAY"`
+	Discovery     DiscoveryConfig   `json:"discovery" env_var:"DISCOVERY_CONFIG"`
+	Procurement   ProcurementConfig `json:"procurement" env_var:"PROCUREMENT_CONFIG"`
+	Filter        FilterConfig      `json:"filter" env_var:"FILTER_CONFIG"`
+	HttpTimeout   time.Duration     `json:"http_timeout" env_var:"HTTP_TIMEOUT"`
+	HttpAccessLog bool              `json:"http_access_log" env_var:"HTTP_ACCESS_LOG"`
 }
 
 func New(path string) (*Config, error) {
 	cfg := Config{
 		ServerPort: 80,
 		Logger: LoggerConfig{
-			Level:        level.Warning,
-			Utc:          true,
-			Microseconds: true,
-			Terminal:     true,
+			Handler:    structured_logger.JsonHandlerSelector,
+			Level:      structured_logger.LevelInfo,
+			TimeFormat: time.RFC3339Nano,
+			TimeUtc:    true,
 		},
 		WorkdirPath: "data",
 		Procurement: ProcurementConfig{

@@ -19,12 +19,14 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"github.com/SENERGY-Platform/go-service-base/structured-logger/attributes"
 	srv_info_hdl "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl"
 	srv_info_lib "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl/lib"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/doc_clt"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/ladon_clt"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
+	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util/slog_attr"
 	"slices"
 	"strings"
 	"sync"
@@ -73,24 +75,24 @@ func (s *Service) SwaggerDocs(ctx context.Context, userToken string, userRoles [
 		wg.Add(1)
 		go func(id string, extPaths []string) {
 			defer wg.Done()
-			util.Logger.Debugf("service: %sreading swagger doc for %v", reqID, extPaths)
+			logger.Debug("reading swagger doc", slog_attr.ExternalPathsKey, extPaths, slog_attr.RequestIDKey, reqID)
 			rawDoc, err := s.storageHdl.Read(ctx, id)
 			if err != nil {
-				util.Logger.Errorf("service: %sreading swagger doc for %v failed: %s", reqID, extPaths, err)
+				logger.Error("reading swagger doc failed", slog_attr.ExternalPathsKey, extPaths, attributes.ErrorKey, err.Error(), slog_attr.RequestIDKey, reqID)
 				return
 			}
 			for _, basePath := range extPaths {
-				util.Logger.Debugf("service: %stransforming swagger doc for '%s'", reqID, basePath)
+				logger.Debug("transforming swagger doc'", slog_attr.BasePathKey, basePath, slog_attr.RequestIDKey, reqID)
 				doc, err := s.transformDoc(rawDoc, basePath)
 				if err != nil {
-					util.Logger.Errorf("service: %stransforming swagger doc for '%s' failed: %s", reqID, basePath, err)
+					logger.Error("transforming swagger doc failed", slog_attr.BasePathKey, basePath, attributes.ErrorKey, err.Error(), slog_attr.RequestIDKey, reqID)
 					continue
 				}
 				if !isAdmin {
-					util.Logger.Debugf("service: %sfiltering swagger doc for '%s'", reqID, basePath)
+					logger.Debug("filtering swagger doc", slog_attr.BasePathKey, basePath, slog_attr.RequestIDKey, reqID)
 					ok, err := s.filterDoc(ctx, doc, userToken, userRoles, basePath)
 					if err != nil {
-						util.Logger.Errorf("service: %sfiltering swagger doc for '%s' failed: %s", reqID, basePath, err)
+						logger.Error("filtering swagger doc failed", slog_attr.BasePathKey, basePath, attributes.ErrorKey, err.Error(), slog_attr.RequestIDKey, reqID)
 						continue
 					}
 					if !ok {
@@ -100,7 +102,7 @@ func (s *Service) SwaggerDocs(ctx context.Context, userToken string, userRoles [
 				mu.Lock()
 				docWrappers = append(docWrappers, docWrapper{basePath: basePath, doc: doc})
 				mu.Unlock()
-				util.Logger.Debugf("service: %sappended swagger doc for '%s'", reqID, basePath)
+				logger.Debug("appended swagger doc", slog_attr.BasePathKey, basePath, slog_attr.RequestIDKey, reqID)
 			}
 		}(item.ID, item.ExtPaths)
 	}

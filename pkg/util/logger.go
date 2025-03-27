@@ -17,15 +17,32 @@
 package util
 
 import (
-	sb_logger "github.com/SENERGY-Platform/go-service-base/logger"
+	"github.com/SENERGY-Platform/go-service-base/structured-logger"
+	"github.com/SENERGY-Platform/go-service-base/structured-logger/attributes"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/config"
-	"os"
+	"io"
+	"log/slog"
 )
 
-var Logger *sb_logger.Logger
+var Logger *slog.Logger
 
-func InitLogger(c config.LoggerConfig) (out *os.File, err error) {
-	Logger, out, err = sb_logger.New(c.Level, c.Path, c.FileName, c.Prefix, c.Utc, c.Terminal, c.Microseconds)
-	Logger.SetLevelPrefix("ERROR ", "WARNING ", "INFO ", "DEBUG ")
-	return
+func InitLogger(c config.LoggerConfig, out io.Writer, organization, project string) {
+	recordTime := structured_logger.NewRecordTime(c.TimeFormat, c.TimeUtc)
+	options := &slog.HandlerOptions{
+		AddSource:   c.AddSource,
+		Level:       structured_logger.GetLevel(c.Level, slog.LevelInfo),
+		ReplaceAttr: recordTime.ReplaceAttr,
+	}
+	handler := structured_logger.GetHandler(c.Handler, out, options, slog.Default().Handler())
+	var attr []slog.Attr
+	if c.AddMeta {
+		if organization != "" {
+			attr = append(attr, slog.String(attributes.OrganizationKey, organization))
+		}
+		if project != "" {
+			attr = append(attr, slog.String(attributes.ProjectKey, project))
+		}
+	}
+	handler = handler.WithAttrs(attr)
+	Logger = slog.New(handler)
 }

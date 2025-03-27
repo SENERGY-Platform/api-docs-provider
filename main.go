@@ -18,9 +18,8 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	sb_logger "github.com/SENERGY-Platform/go-service-base/logger"
+	"github.com/SENERGY-Platform/go-service-base/structured-logger/attributes"
 	srv_info_hdl "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl"
 	sb_util "github.com/SENERGY-Platform/mgw-go-service-base/util"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/api"
@@ -32,6 +31,7 @@ import (
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/config"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/service"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
+	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util/slog_attr"
 	"net/http"
 	"os"
 	"sync"
@@ -57,22 +57,14 @@ func main() {
 		return
 	}
 
-	logFile, err := util.InitLogger(cfg.Logger)
-	if err != nil {
-		_, _ = fmt.Fprintln(os.Stderr, err)
-		var logFileError *sb_logger.LogFileError
-		if errors.As(err, &logFileError) {
-			ec = 1
-			return
-		}
-	}
-	if logFile != nil {
-		defer logFile.Close()
-	}
+	util.InitLogger(cfg.Logger, os.Stderr, "github.com/SENERGY-Platform", srvInfoHdl.GetName())
+	service.InitLogger()
+	storage_hdl.InitLogger()
+	discovery_hdl.InitLogger()
 
-	util.Logger.Printf("%s %s", srvInfoHdl.GetName(), srvInfoHdl.GetVersion())
+	util.Logger.Info("starting service", slog_attr.VersionKey, srvInfoHdl.GetVersion())
 
-	util.Logger.Debugf("config: %s", sb_util.ToJsonStr(cfg))
+	util.Logger.Debug(sb_util.ToJsonStr(cfg))
 
 	storageHdl := storage_hdl.New(cfg.WorkdirPath)
 
@@ -97,9 +89,9 @@ func main() {
 	httpHandler, err := api.New(srv, map[string]string{
 		api.HeaderApiVer:  srvInfoHdl.GetVersion(),
 		api.HeaderSrvName: srvInfoHdl.GetName(),
-	})
+	}, cfg.HttpAccessLog)
 	if err != nil {
-		util.Logger.Error(err)
+		util.Logger.Error("creating http engine failed", attributes.ErrorKey, err)
 		ec = 1
 		return
 	}
@@ -114,7 +106,7 @@ func main() {
 	}()
 
 	if err = storageHdl.Init(ctx); err != nil {
-		util.Logger.Error(err)
+		util.Logger.Error("initializing storage handler failed", attributes.ErrorKey, err)
 		ec = 1
 		return
 	}
@@ -125,7 +117,7 @@ func main() {
 	go func() {
 		defer wg.Done()
 		if err := srv.RunPeriodicProcurement(ctx, cfg.Procurement.Interval); err != nil {
-			util.Logger.Error(err)
+			util.Logger.Error("periodic procurement failed", attributes.ErrorKey, err)
 			ec = 1
 		}
 		cf()
@@ -133,7 +125,7 @@ func main() {
 
 	go func() {
 		if err := util.StartServer(httpServer); err != nil {
-			util.Logger.Error(err)
+			util.Logger.Error("starting server failed", attributes.ErrorKey, err)
 			ec = 1
 		}
 		cf()
@@ -143,7 +135,7 @@ func main() {
 	go func() {
 		defer wg.Done()
 		if err := util.StopServer(ctx, httpServer); err != nil {
-			util.Logger.Error(err)
+			util.Logger.Error("stopping server failed", attributes.ErrorKey, err)
 			ec = 1
 		}
 	}()

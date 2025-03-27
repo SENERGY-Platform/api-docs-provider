@@ -21,8 +21,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/SENERGY-Platform/go-service-base/structured-logger/attributes"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
+	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util/slog_attr"
 	"github.com/google/uuid"
 	"io"
 	"io/fs"
@@ -62,10 +64,10 @@ func (h *Handler) Init(ctx context.Context) error {
 			se := storageItem{dirName: dirEntry.Name()}
 			data, err := readData(path.Join(h.dirPath, se.dirName, dataFileName))
 			if err != nil {
-				util.Logger.Errorf("storage: reading from '%s' failed: %v", se.dirName, err)
+				logger.Error("reading storage item failed", slog_attr.DirNameKey, se.dirName, attributes.ErrorKey, err)
 			}
 			se.StorageData = data
-			util.Logger.Debugf("storage: loaded '%s' from '%s'", se.ID, se.dirName)
+			logger.Debug("loaded storage item", slog_attr.IDKey, se.ID, slog_attr.DirNameKey, se.dirName)
 			h.items[se.ID] = se
 		}
 	}
@@ -98,7 +100,7 @@ func (h *Handler) Write(ctx context.Context, id string, extPaths []string, data 
 	defer func() {
 		if err != nil {
 			if e := os.RemoveAll(path.Join(h.dirPath, newDirName)); e != nil {
-				util.Logger.Errorf("storage: %sremoving new dir '%s' of '%s' failed: %s", reqID, newDirName, id, e)
+				logger.Error("removing new dir failed", slog_attr.DirNameKey, newDirName, slog_attr.IDKey, id, attributes.ErrorKey, e, slog_attr.RequestIDKey, reqID)
 			}
 		}
 	}()
@@ -134,10 +136,10 @@ func (h *Handler) Write(ctx context.Context, id string, extPaths []string, data 
 	h.items[id] = item
 	if oldDirName != "" {
 		if e := os.RemoveAll(path.Join(h.dirPath, oldDirName)); e != nil {
-			util.Logger.Errorf("storage: %sremoving old dir '%s' of '%s' failed: %s", reqID, oldDirName, id, e)
+			logger.Error("removing old dir failed", slog_attr.DirNameKey, oldDirName, slog_attr.IDKey, id, attributes.ErrorKey, e, slog_attr.RequestIDKey, reqID)
 		}
 	}
-	util.Logger.Debugf("storage: %s'%s' written to '%s'", reqID, id, newDirName)
+	logger.Debug("saved storage item", slog_attr.DirNameKey, newDirName, slog_attr.IDKey, id, slog_attr.RequestIDKey, reqID)
 	return nil
 }
 

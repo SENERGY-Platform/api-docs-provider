@@ -14,26 +14,18 @@
  * limitations under the License.
  */
 
-package util
+package slog_attr
 
-import (
-	"context"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util/slog_attr"
-	"os"
-	"os/signal"
+const (
+	RequestIDKey     = "request_id"
+	BasePathKey      = "base_path"
+	ExternalPathsKey = "external_paths"
+	HostKey          = "host"
+	PortKey          = "port"
+	StackTraceKey    = "stack_trace"
+	DirNameKey       = "dir_name"
+	IDKey            = "id"
+	NumberKey        = "number"
+	VersionKey       = "version"
+	ComponentKey     = "component"
 )
-
-func WaitForSignal(ctx context.Context, signals ...os.Signal) {
-	ch := make(chan os.Signal, 1)
-	for _, sig := range signals {
-		signal.Notify(ch, sig)
-	}
-	select {
-	case sig := <-ch:
-		Logger.Warn("caught os signal", slog_attr.NumberKey, sig.String())
-		break
-	case <-ctx.Done():
-		break
-	}
-	signal.Stop(ch)
-}

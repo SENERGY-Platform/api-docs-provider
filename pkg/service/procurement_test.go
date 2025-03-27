@@ -24,6 +24,7 @@ import (
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/config"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
+	"os"
 	"reflect"
 	"sync"
 	"testing"
@@ -104,7 +105,7 @@ func TestService_RefreshStorage(t *testing.T) {
 			},
 		},
 	}
-	util.InitLogger(config.LoggerConfig{Level: 4, Terminal: true})
+	util.InitLogger(config.LoggerConfig{}, os.Stderr, "", "")
 	srv := New(storageHdl, discoveryHdl, nil, docClt, nil, 0, "", "")
 	err = srv.RefreshStorage(context.Background())
 	if err != nil {

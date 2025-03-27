@@ -21,20 +21,24 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/SENERGY-Platform/go-service-base/structured-logger/attributes"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
+	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util/slog_attr"
+	"runtime/debug"
 	"sync"
 	"time"
 )
 
 func (s *Service) RunPeriodicProcurement(ctx context.Context, interval time.Duration) error {
-	util.Logger.Info("service: starting periodic procurement")
+	logger.Info("starting periodic procurement")
 	var lErr error
 	defer func() {
 		if r := recover(); r != nil {
-			lErr = fmt.Errorf("periodic procurement paniced:\n%v", r)
+			lErr = fmt.Errorf("%s", r)
+			logger.Error("periodic procurement panicked", slog_attr.StackTraceKey, string(debug.Stack()))
 		}
-		util.Logger.Info("service: periodic procurement halted")
+		logger.Info("periodic procurement halted")
 	}()
 	timer := time.NewTimer(time.Microsecond)
 	loop := true
@@ -45,13 +49,13 @@ func (s *Service) RunPeriodicProcurement(ctx context.Context, interval time.Dura
 			if err != nil {
 				var rbe *models.ResourceBusyError
 				if !errors.As(err, &rbe) {
-					util.Logger.Errorf("service: procurement failed: %s", err)
+					logger.Error("procurement failed", attributes.ErrorKey, err)
 				}
 			}
 			timer.Reset(interval)
 		case <-ctx.Done():
 			loop = false
-			util.Logger.Info("service: stopping periodic procurement")
+			logger.Info("stopping periodic procurement")
 			break
 		}
 	}
@@ -84,9 +88,8 @@ func (s *Service) RefreshStorage(ctx context.Context) error {
 		}
 	}
 	wg.Wait()
-	reqID := util.GetReqID(ctx)
 	if err = s.cleanOldServices(ctx, services); err != nil {
-		util.Logger.Errorf("serivce: %sremoving old docs failed: %s", reqID, err)
+		logger.Error("removing old docs failed", attributes.ErrorKey, err, slog_attr.RequestIDKey, util.GetReqID(ctx))
 	}
 	return nil
 }
@@ -96,11 +99,10 @@ func (s *Service) cleanOldServices(ctx context.Context, services map[string]mode
 	if err != nil {
 		return err
 	}
-	reqID := util.GetReqID(ctx)
 	for _, service := range storedServices {
 		if _, ok := services[service.ID]; !ok {
 			if err = s.storageHdl.Delete(ctx, service.ID); err != nil {
-				util.Logger.Errorf("serivce: %sremoving old doc failed: %s", reqID, err)
+				logger.Error("removing old doc failed", attributes.ErrorKey, err, slog_attr.RequestIDKey, util.GetReqID(ctx))
 			}
 		}
 	}
@@ -112,18 +114,18 @@ func (s *Service) handleService(ctx context.Context, wg *sync.WaitGroup, service
 	ctxWt, cf := context.WithTimeout(ctx, s.timeout)
 	defer cf()
 	reqID := util.GetReqID(ctx)
-	util.Logger.Debugf("service: %sprobing '%s:%d' for doc", reqID, service.Host, service.Port)
+	logger.Debug("probing host", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, slog_attr.RequestIDKey, reqID)
 	doc, err := s.docClt.GetDoc(ctxWt, service.Protocol, service.Host, service.Port)
 	if err != nil {
-		util.Logger.Debugf("service: %sprobing '%s:%d' for doc failed: %s", reqID, service.Host, service.Port, err)
+		logger.Debug("probing host failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
 		return
 	}
 	if err = validateDoc(doc); err != nil {
-		util.Logger.Warningf("service: %svalidating doc for '%s:%d' failed: %s", reqID, service.Host, service.Port, err)
+		logger.Warn("validating doc failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
 		return
 	}
 	if err = s.storageHdl.Write(ctx, service.ID, service.ExtPaths, doc); err != nil {
-		util.Logger.Errorf("service: %swriting doc for '%s:%d' failed: %s", reqID, service.Host, service.Port, err)
+		logger.Error("writing doc failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
 		return
 	}
 }
