@@ -59,7 +59,6 @@ func main() {
 
 	util.InitLogger(cfg.Logger, os.Stderr, "github.com/SENERGY-Platform", srvInfoHdl.GetName())
 	service.InitLogger()
-	storage_hdl.InitLogger()
 	discovery_hdl.InitLogger()
 
 	util.Logger.Info("starting service", slog_attr.VersionKey, srvInfoHdl.GetVersion())
