@@ -44,14 +44,19 @@ type DiscoveryConfig struct {
 	HostBlacklist []string   `json:"host_blacklist" env_var:"DISCOVERY_HOST_BLACKLIST" env_params:"sep=,"`
 }
 
+type StorageConfig struct {
+	SwaggerDataPath  string `json:"swagger_data_path" env_var:"SWAGGER_DATA_PATH"`
+	AsyncapiDataPath string `json:"asyncapi_data_path" env_var:"ASYNCAPI_DATA_PATH"`
+}
+
 type Config struct {
 	ServerPort    int                  `json:"server_port" env_var:"SERVER_PORT"`
-	Logger        struct_logger.Config `json:"logger" env_var:"LOGGER_CONFIG"`
-	WorkdirPath   string               `json:"workdir_path" env_var:"WORKDIR_PATH"`
+	Logger        struct_logger.Config `json:"logger"`
+	Storage       StorageConfig        `json:"storage"`
 	ApiGateway    string               `json:"api_gateway" env_var:"API_GATEWAY"`
-	Discovery     DiscoveryConfig      `json:"discovery" env_var:"DISCOVERY_CONFIG"`
-	Procurement   ProcurementConfig    `json:"procurement" env_var:"PROCUREMENT_CONFIG"`
-	Filter        FilterConfig         `json:"filter" env_var:"FILTER_CONFIG"`
+	Discovery     DiscoveryConfig      `json:"discovery"`
+	Procurement   ProcurementConfig    `json:"procurement"`
+	Filter        FilterConfig         `json:"filter"`
 	HttpTimeout   time.Duration        `json:"http_timeout" env_var:"HTTP_TIMEOUT"`
 	HttpAccessLog bool                 `json:"http_access_log" env_var:"HTTP_ACCESS_LOG"`
 }
@@ -65,7 +70,10 @@ func New(path string) (*Config, error) {
 			TimeFormat: time.RFC3339Nano,
 			TimeUtc:    true,
 		},
-		WorkdirPath: "data",
+		Storage: StorageConfig{
+			SwaggerDataPath:  "swagger-data",
+			AsyncapiDataPath: "asyncapi-data",
+		},
 		Procurement: ProcurementConfig{
 			Interval: time.Hour * 6,
 		},
