@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package service
+package swagger_hdl
 
 import (
 	"context"
@@ -25,7 +25,7 @@ import (
 
 var regRegex = regexp.MustCompile(`\"\$ref\": ?\"#\/definitions\/(.+)\"`)
 
-func (s *Service) filterDoc(ctx context.Context, doc map[string]json.RawMessage, userToken string, userRoles []string, basePath string) (bool, error) {
+func (h *Handler) filterDoc(ctx context.Context, doc map[string]json.RawMessage, userToken string, userRoles []string, basePath string) (bool, error) {
 	oldPaths, err := getDocPaths(doc)
 	if err != nil {
 		return false, err
@@ -36,12 +36,12 @@ func (s *Service) filterDoc(ctx context.Context, doc map[string]json.RawMessage,
 	var newPaths map[string]map[string]json.RawMessage
 	var allowedRefs map[string]struct{}
 	if userToken != "" {
-		newPaths, allowedRefs, err = s.getNewPathsByToken(ctx, oldPaths, basePath, userToken)
+		newPaths, allowedRefs, err = h.getNewPathsByToken(ctx, oldPaths, basePath, userToken)
 		if err != nil {
 			return false, err
 		}
 	} else {
-		newPaths, allowedRefs, err = s.getNewPathsByRoles(ctx, oldPaths, basePath, userRoles)
+		newPaths, allowedRefs, err = h.getNewPathsByRoles(ctx, oldPaths, basePath, userRoles)
 		if err != nil {
 			return false, err
 		}
@@ -65,10 +65,10 @@ func (s *Service) filterDoc(ctx context.Context, doc map[string]json.RawMessage,
 	return true, nil
 }
 
-func (s *Service) getNewPathsByToken(ctx context.Context, oldPaths map[string]map[string]json.RawMessage, basePath string, userToken string) (map[string]map[string]json.RawMessage, map[string]struct{}, error) {
-	ctxWt, cf := context.WithTimeout(ctx, s.timeout)
+func (h *Handler) getNewPathsByToken(ctx context.Context, oldPaths map[string]map[string]json.RawMessage, basePath string, userToken string) (map[string]map[string]json.RawMessage, map[string]struct{}, error) {
+	ctxWt, cf := context.WithTimeout(ctx, h.timeout)
 	defer cf()
-	accessPolicies, err := s.ladonClt.GetUserAccessPolicy(ctxWt, userToken, getPathMethodsMap(oldPaths, basePath))
+	accessPolicies, err := h.ladonClt.GetUserAccessPolicy(ctxWt, userToken, getPathMethodsMap(oldPaths, basePath))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -96,7 +96,7 @@ func (s *Service) getNewPathsByToken(ctx context.Context, oldPaths map[string]ma
 	return newPaths, defRefs, nil
 }
 
-func (s *Service) getNewPathsByRoles(ctx context.Context, oldPaths map[string]map[string]json.RawMessage, basePath string, userRoles []string) (map[string]map[string]json.RawMessage, map[string]struct{}, error) {
+func (h *Handler) getNewPathsByRoles(ctx context.Context, oldPaths map[string]map[string]json.RawMessage, basePath string, userRoles []string) (map[string]map[string]json.RawMessage, map[string]struct{}, error) {
 	newPaths := make(map[string]map[string]json.RawMessage)
 	defRefs := make(map[string]struct{})
 	for subPath, methods := range oldPaths {
@@ -104,7 +104,7 @@ func (s *Service) getNewPathsByRoles(ctx context.Context, oldPaths map[string]ma
 		fullPath := path.Join(basePath, subPath)
 		for method, rawMessage := range methods {
 			for _, role := range userRoles {
-				ok, err := s.getAccessPolicyByRole(ctx, fullPath, role, method)
+				ok, err := h.getAccessPolicyByRole(ctx, fullPath, role, method)
 				if err != nil {
 					return nil, nil, err
 				}
@@ -122,10 +122,10 @@ func (s *Service) getNewPathsByRoles(ctx context.Context, oldPaths map[string]ma
 	return newPaths, defRefs, nil
 }
 
-func (s *Service) getAccessPolicyByRole(ctx context.Context, fullPath, role, method string) (bool, error) {
-	ctxWt, cf := context.WithTimeout(ctx, s.timeout)
+func (h *Handler) getAccessPolicyByRole(ctx context.Context, fullPath, role, method string) (bool, error) {
+	ctxWt, cf := context.WithTimeout(ctx, h.timeout)
 	defer cf()
-	return s.ladonClt.GetRoleAccessPolicy(ctxWt, role, fullPath, method)
+	return h.ladonClt.GetRoleAccessPolicy(ctxWt, role, fullPath, method)
 }
 
 func getDocPaths(doc map[string]json.RawMessage) (map[string]map[string]json.RawMessage, error) {

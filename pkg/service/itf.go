@@ -18,16 +18,12 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
 )
 
-type DiscoveryHandler interface {
-	GetServices(ctx context.Context) (map[string]models.Service, error)
-}
-
-type StorageHandler interface {
-	List(ctx context.Context) ([]models.StorageData, error)
-	Write(ctx context.Context, id string, args [][2]string, data []byte) error
-	Read(ctx context.Context, id string) ([]byte, error)
-	Delete(ctx context.Context, id string) error
+type SwaggerHandler interface {
+	GetDocs(ctx context.Context, userToken string, userRoles []string) ([]map[string]json.RawMessage, error)
+	ListStorage(ctx context.Context) ([]models.StorageData, error)
+	RefreshStorage(ctx context.Context) error
 }

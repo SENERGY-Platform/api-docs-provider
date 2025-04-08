@@ -28,6 +28,7 @@ import (
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/kong_clt"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/ladon_clt"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/storage_hdl"
+	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/swagger_hdl"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/config"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/service"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
@@ -58,7 +59,7 @@ func main() {
 	}
 
 	util.InitLogger(cfg.Logger, os.Stderr, "github.com/SENERGY-Platform", srvInfoHdl.GetName())
-	service.InitLogger()
+	swagger_hdl.InitLogger()
 	discovery_hdl.InitLogger()
 
 	util.Logger.Info("starting service", slog_attr.VersionKey, srvInfoHdl.GetVersion())
@@ -66,6 +67,7 @@ func main() {
 	util.Logger.Debug(sb_util.ToJsonStr(cfg))
 
 	swaggerStgHdl := storage_hdl.New(cfg.Storage.SwaggerDataPath, "swagger")
+
 	asyncapiStgHdl := storage_hdl.New(cfg.Storage.AsyncapiDataPath, "asyncapi")
 
 	kongClt := kong_clt.New(&http.Client{Transport: http.DefaultTransport}, cfg.Discovery.Kong.BaseURL, cfg.Discovery.Kong.User, cfg.Discovery.Kong.Password.Value())
@@ -76,15 +78,9 @@ func main() {
 
 	ladonClt := ladon_clt.New(&http.Client{Transport: http.DefaultTransport}, cfg.Filter.LadonBaseUrl)
 
-	srv := service.New(
-		swaggerStgHdl,
-		discoveryHdl,
-		srvInfoHdl,
-		docClt,
-		ladonClt,
-		cfg.HttpTimeout,
-		cfg.ApiGateway,
-		cfg.Filter.AdminRoleName)
+	swaggerHdl := swagger_hdl.New(swaggerStgHdl, discoveryHdl, docClt, ladonClt, cfg.HttpTimeout, cfg.ApiGateway, cfg.Filter.AdminRoleName)
+
+	srv := service.New(swaggerHdl, srvInfoHdl)
 
 	httpHandler, err := api.New(srv, map[string]string{
 		api.HeaderApiVer:  srvInfoHdl.GetVersion(),
@@ -122,7 +118,7 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err := srv.RunPeriodicProcurement(ctx, cfg.Procurement.Interval); err != nil {
+		if err := swaggerHdl.RunPeriodicProcurement(ctx, cfg.Procurement.Interval); err != nil {
 			util.Logger.Error("periodic procurement failed", attributes.ErrorKey, err)
 			ec = 1
 		}

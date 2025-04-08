@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package service
+package swagger_hdl
 
 import (
 	"context"
@@ -30,7 +30,7 @@ import (
 	"testing"
 )
 
-func TestService_RefreshStorage(t *testing.T) {
+func TestHandler_RefreshStorage(t *testing.T) {
 	validDoc, err := json.Marshal(map[string]json.RawMessage{
 		"swagger": nil,
 		"info":    nil,
@@ -107,7 +107,7 @@ func TestService_RefreshStorage(t *testing.T) {
 	}
 	util.InitLogger(struct_logger.Config{}, os.Stderr, "", "")
 	InitLogger()
-	srv := New(storageHdl, discoveryHdl, nil, docClt, nil, 0, "", "")
+	srv := New(storageHdl, discoveryHdl, docClt, nil, 0, "", "")
 	err = srv.RefreshStorage(context.Background())
 	if err != nil {
 		t.Error(err)
@@ -189,7 +189,7 @@ func Test_validateDoc(t *testing.T) {
 	})
 }
 
-func TestService_cleanOldServices(t *testing.T) {
+func TestHandler_cleanOldServices(t *testing.T) {
 	sHdl := &storageHdlMock{
 		Items: map[string]struct {
 			models.StorageData
@@ -209,7 +209,7 @@ func TestService_cleanOldServices(t *testing.T) {
 			},
 		},
 	}
-	srv := New(sHdl, nil, nil, nil, nil, 0, "", "")
+	srv := New(sHdl, nil, nil, nil, 0, "", "")
 	err := srv.cleanOldServices(context.Background(), map[string]models.Service{
 		"id-2": {
 			ID: "id-2",

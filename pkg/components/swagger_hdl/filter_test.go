@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package service
+package swagger_hdl
 
 import (
 	"context"
@@ -24,7 +24,7 @@ import (
 	"testing"
 )
 
-func TestService_filterDoc(t *testing.T) {
+func TestHandler_filterDoc(t *testing.T) {
 	f, err := os.Open("test/swagger.json")
 	if err != nil {
 		t.Fatal(err)
@@ -35,7 +35,7 @@ func TestService_filterDoc(t *testing.T) {
 		t.Fatal(err)
 	}
 	ladonClt := &ladonCltMock{}
-	srv := New(nil, nil, nil, nil, ladonClt, 0, "", "")
+	srv := New(nil, nil, nil, ladonClt, 0, "", "")
 	t.Run("include", func(t *testing.T) {
 		ladonClt.TokenPolicies = map[string][]string{
 			"/a": {"get"},
@@ -102,9 +102,9 @@ func Test_getNewDefinitions(t *testing.T) {
 	})
 }
 
-func TestService_getNewPathsByRoles(t *testing.T) {
+func TestHandler_getNewPathsByRoles(t *testing.T) {
 	ladonClt := &ladonCltMock{}
-	srv := New(nil, nil, nil, nil, ladonClt, 0, "", "")
+	srv := New(nil, nil, nil, ladonClt, 0, "", "")
 	f, err := os.Open("test/swagger.json")
 	if err != nil {
 		t.Fatal(err)
@@ -199,9 +199,9 @@ func TestService_getNewPathsByRoles(t *testing.T) {
 	})
 }
 
-func TestService_getNewPathsByToken(t *testing.T) {
+func TestHandler_getNewPathsByToken(t *testing.T) {
 	ladonClt := &ladonCltMock{}
-	srv := New(nil, nil, nil, nil, ladonClt, 0, "", "")
+	srv := New(nil, nil, nil, ladonClt, 0, "", "")
 	f, err := os.Open("test/swagger.json")
 	if err != nil {
 		t.Fatal(err)
@@ -296,9 +296,9 @@ func TestService_getNewPathsByToken(t *testing.T) {
 	})
 }
 
-func TestService_transformDoc(t *testing.T) {
+func TestHandler_transformDoc(t *testing.T) {
 	orgDoc := []byte("{\"host\": \"org\", \"basePath\": \"org\", \"schemes\": [\"http\"]}")
-	srv := New(nil, nil, nil, nil, nil, 0, "test", "")
+	srv := New(nil, nil, nil, nil, 0, "test", "")
 	aRaw := []byte("{\"host\": \"test\", \"basePath\": \"test\", \"schemes\": [\"http\"]}")
 	var a map[string]json.RawMessage
 	if err := json.Unmarshal(aRaw, &a); err != nil {

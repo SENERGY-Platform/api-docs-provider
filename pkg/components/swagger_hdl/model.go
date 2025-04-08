@@ -14,16 +14,36 @@
  * limitations under the License.
  */
 
-package service
+package swagger_hdl
 
 import (
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util/slog_attr"
-	"log/slog"
+	"encoding/json"
 )
 
-var logger *slog.Logger
+const (
+	swaggerKey            = "swagger"
+	swaggerInfoKey        = "info"
+	swaggerOpenApiKey     = "openapi"
+	swaggerHostKey        = "host"
+	swaggerBasePathKey    = "basePath"
+	swaggerSchemesKey     = "schemes"
+	swaggerPathsKey       = "paths"
+	swaggerDefinitionsKey = "definitions"
+)
 
-func InitLogger() {
-	logger = util.Logger.With(slog_attr.ComponentKey, "service")
+var swaggerV2Keys = []string{
+	swaggerKey,
+	swaggerInfoKey,
+	swaggerPathsKey,
+}
+
+var swaggerV3Keys = []string{
+	swaggerInfoKey,
+	swaggerOpenApiKey,
+	swaggerPathsKey,
+}
+
+type docWrapper struct {
+	basePath string
+	doc      map[string]json.RawMessage
 }

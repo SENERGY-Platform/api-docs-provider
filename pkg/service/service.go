@@ -19,165 +19,42 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"github.com/SENERGY-Platform/go-service-base/struct-logger/attributes"
 	srv_info_hdl "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl"
 	srv_info_lib "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl/lib"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/doc_clt"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/ladon_clt"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util/slog_attr"
-	"slices"
-	"strings"
-	"sync"
-	"time"
 )
 
-const extPathKey = "ext-path"
-
 type Service struct {
-	storageHdl    StorageHandler
-	discoveryHdl  DiscoveryHandler
-	srvInfoHdl    srv_info_hdl.SrvInfoHandler
-	docClt        doc_clt.ClientItf
-	ladonClt      ladon_clt.ClientItf
-	timeout       time.Duration
-	apiGtwHost    string
-	adminRoleName string
-	mu            sync.Mutex
+	swaggerHdl SwaggerHandler
+	srvInfoHdl srv_info_hdl.SrvInfoHandler
 }
 
-func New(storageHdl StorageHandler, discoveryHdl DiscoveryHandler, srvInfoHdl srv_info_hdl.SrvInfoHandler, docClt doc_clt.ClientItf, ladonClt ladon_clt.ClientItf, timeout time.Duration, apiGtwHost string, adminRoleName string) *Service {
+func New(swaggerHdl SwaggerHandler, srvInfoHdl srv_info_hdl.SrvInfoHandler) *Service {
 	return &Service{
-		storageHdl:    storageHdl,
-		discoveryHdl:  discoveryHdl,
-		srvInfoHdl:    srvInfoHdl,
-		docClt:        docClt,
-		ladonClt:      ladonClt,
-		timeout:       timeout,
-		apiGtwHost:    apiGtwHost,
-		adminRoleName: adminRoleName,
+		swaggerHdl: swaggerHdl,
+		srvInfoHdl: srvInfoHdl,
 	}
 }
 
 func (s *Service) SwaggerDocs(ctx context.Context, userToken string, userRoles []string) ([]map[string]json.RawMessage, error) {
-	if userToken == "" && len(userRoles) == 0 {
-		return []map[string]json.RawMessage{}, nil
-	}
-	data, err := s.storageHdl.List(ctx)
-	if err != nil {
-		return []map[string]json.RawMessage{}, models.NewInternalError(err)
-	}
-	reqID := util.GetReqID(ctx)
-	isAdmin := stringInSlice(s.adminRoleName, userRoles)
-	var docWrappers []docWrapper
-	wg := sync.WaitGroup{}
-	mu := sync.Mutex{}
-	for _, item := range data {
-		wg.Add(1)
-		go func(id string, extPaths []string) {
-			defer wg.Done()
-			logger.Debug("reading swagger doc", slog_attr.ExternalPathsKey, extPaths, slog_attr.RequestIDKey, reqID)
-			rawDoc, err := s.storageHdl.Read(ctx, id)
-			if err != nil {
-				logger.Error("reading swagger doc failed", slog_attr.ExternalPathsKey, extPaths, attributes.ErrorKey, err.Error(), slog_attr.RequestIDKey, reqID)
-				return
-			}
-			for _, basePath := range extPaths {
-				logger.Debug("transforming swagger doc'", slog_attr.BasePathKey, basePath, slog_attr.RequestIDKey, reqID)
-				doc, err := s.transformDoc(rawDoc, basePath)
-				if err != nil {
-					logger.Error("transforming swagger doc failed", slog_attr.BasePathKey, basePath, attributes.ErrorKey, err.Error(), slog_attr.RequestIDKey, reqID)
-					continue
-				}
-				if !isAdmin {
-					logger.Debug("filtering swagger doc", slog_attr.BasePathKey, basePath, slog_attr.RequestIDKey, reqID)
-					ok, err := s.filterDoc(ctx, doc, userToken, userRoles, basePath)
-					if err != nil {
-						logger.Error("filtering swagger doc failed", slog_attr.BasePathKey, basePath, attributes.ErrorKey, err.Error(), slog_attr.RequestIDKey, reqID)
-						continue
-					}
-					if !ok {
-						continue
-					}
-				}
-				mu.Lock()
-				docWrappers = append(docWrappers, docWrapper{basePath: basePath, doc: doc})
-				mu.Unlock()
-				logger.Debug("appended swagger doc", slog_attr.BasePathKey, basePath, slog_attr.RequestIDKey, reqID)
-			}
-		}(item.ID, getExtPaths(item.Args))
-	}
-	wg.Wait()
-	slices.SortStableFunc(docWrappers, func(a, b docWrapper) int {
-		return strings.Compare(a.basePath, b.basePath)
-	})
-	docs := make([]map[string]json.RawMessage, 0, len(docWrappers))
-	for _, dw := range docWrappers {
-		docs = append(docs, dw.doc)
-	}
-	return docs, nil
+	return s.swaggerHdl.GetDocs(ctx, userToken, userRoles)
 }
 
-func (s *Service) ListStorage(ctx context.Context) ([]models.StorageData, error) {
-	items, err := s.storageHdl.List(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return items, nil
+func (s *Service) SwaggerStorageRefresh(ctx context.Context) error {
+	return s.swaggerHdl.RefreshStorage(ctx)
 }
 
-func (s *Service) HealthCheck(ctx context.Context) error {
-	if _, err := s.storageHdl.List(ctx); err != nil {
-		return models.NewInternalError(err)
-	}
-	return nil
+func (s *Service) SwaggerStorageList(ctx context.Context) ([]models.StorageData, error) {
+	return s.swaggerHdl.ListStorage(ctx)
 }
 
 func (s *Service) SrvInfo(_ context.Context) srv_info_lib.SrvInfo {
 	return s.srvInfoHdl.GetInfo()
 }
 
-func (s *Service) transformDoc(rawDoc []byte, basePath string) (map[string]json.RawMessage, error) {
-	var doc map[string]json.RawMessage
-	err := json.Unmarshal(rawDoc, &doc)
-	if err != nil {
-		return nil, models.NewInternalError(err)
+func (s *Service) HealthCheck(ctx context.Context) error {
+	if _, err := s.swaggerHdl.ListStorage(ctx); err != nil {
+		return models.NewInternalError(err)
 	}
-	b, err := json.Marshal(s.apiGtwHost)
-	if err != nil {
-		return nil, models.NewInternalError(err)
-	}
-	doc[swaggerHostKey] = b
-	b, err = json.Marshal(basePath)
-	if err != nil {
-		return nil, models.NewInternalError(err)
-	}
-	doc[swaggerBasePathKey] = b
-	if _, ok := doc[swaggerSchemesKey]; !ok {
-		b, err = json.Marshal([]string{"https"})
-		if err != nil {
-			return nil, models.NewInternalError(err)
-		}
-		doc[swaggerSchemesKey] = b
-	}
-	return doc, nil
-}
-
-func stringInSlice(a string, sl []string) bool {
-	for _, b := range sl {
-		if b == a {
-			return true
-		}
-	}
-	return false
-}
-
-func getExtPaths(args [][2]string) (extPaths []string) {
-	for _, arg := range args {
-		if arg[0] == extPathKey {
-			extPaths = append(extPaths, arg[1])
-		}
-	}
-	return
+	return nil
 }

@@ -63,7 +63,7 @@ func getSwaggerDocsH(srv Service) (string, string, gin.HandlerFunc) {
 // @Router /storage/refresh [patch]
 func patchStorageRefreshH(srv Service) (string, string, gin.HandlerFunc) {
 	return http.MethodPatch, "/storage/refresh", func(gc *gin.Context) {
-		err := srv.RefreshStorage(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)))
+		err := srv.SwaggerStorageRefresh(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)))
 		if err != nil {
 			_ = gc.Error(err)
 			return
@@ -82,7 +82,7 @@ func patchStorageRefreshH(srv Service) (string, string, gin.HandlerFunc) {
 // @Router /storage/list [get]
 func getStorageListH(srv Service) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, "/storage/list", func(gc *gin.Context) {
-		list, err := srv.ListStorage(gc.Request.Context())
+		list, err := srv.SwaggerStorageList(gc.Request.Context())
 		if err != nil {
 			_ = gc.Error(err)
 			return
