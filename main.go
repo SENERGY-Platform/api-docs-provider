@@ -66,7 +66,8 @@ func main() {
 
 	util.Logger.Debug(sb_util.ToJsonStr(cfg))
 
-	storageHdl := storage_hdl.New(cfg.WorkdirPath)
+	swaggerStgHdl := storage_hdl.New(cfg.Storage.SwaggerDataPath, "swagger")
+	asyncapiStgHdl := storage_hdl.New(cfg.Storage.AsyncapiDataPath, "asyncapi")
 
 	kongClt := kong_clt.New(&http.Client{Transport: http.DefaultTransport}, cfg.Discovery.Kong.BaseURL, cfg.Discovery.Kong.User, cfg.Discovery.Kong.Password.Value())
 
@@ -77,7 +78,7 @@ func main() {
 	ladonClt := ladon_clt.New(&http.Client{Transport: http.DefaultTransport}, cfg.Filter.LadonBaseUrl)
 
 	srv := service.New(
-		storageHdl,
+		swaggerStgHdl,
 		discoveryHdl,
 		srvInfoHdl,
 		docClt,
@@ -105,8 +106,14 @@ func main() {
 		cf()
 	}()
 
-	if err = storageHdl.Init(ctx); err != nil {
-		util.Logger.Error("initializing storage handler failed", attributes.ErrorKey, err)
+	if err = swaggerStgHdl.Init(ctx); err != nil {
+		util.Logger.Error("initializing swagger storage handler failed", attributes.ErrorKey, err)
+		ec = 1
+		return
+	}
+
+	if err = asyncapiStgHdl.Init(ctx); err != nil {
+		util.Logger.Error("initializing asyncapi storage handler failed", attributes.ErrorKey, err)
 		ec = 1
 		return
 	}
