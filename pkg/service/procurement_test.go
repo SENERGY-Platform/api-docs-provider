@@ -46,15 +46,15 @@ func TestService_RefreshStorage(t *testing.T) {
 		}{
 			"ph0": {
 				StorageData: models.StorageData{
-					ID:       "ph0",
-					ExtPaths: []string{"/x"},
+					ID:   "ph0",
+					Args: [][2]string{{extPathKey, "/x"}},
 				},
 				data: validDoc,
 			},
 			"ph9": {
 				StorageData: models.StorageData{
-					ID:       "ph9",
-					ExtPaths: []string{"/t"},
+					ID:   "ph9",
+					Args: [][2]string{{extPathKey, "/t"}},
 				},
 				data: validDoc,
 			},
@@ -118,15 +118,15 @@ func TestService_RefreshStorage(t *testing.T) {
 	}{
 		"ph0": {
 			StorageData: models.StorageData{
-				ID:       "ph0",
-				ExtPaths: []string{"/t"},
+				ID:   "ph0",
+				Args: [][2]string{{extPathKey, "/t"}},
 			},
 			data: validDoc,
 		},
 		"ph1": {
 			StorageData: models.StorageData{
-				ID:       "ph1",
-				ExtPaths: []string{"/t"},
+				ID:   "ph1",
+				Args: [][2]string{{extPathKey, "/t"}},
 			},
 			data: validDoc,
 		},
@@ -197,14 +197,14 @@ func TestService_cleanOldServices(t *testing.T) {
 		}{
 			"id-1": {
 				StorageData: models.StorageData{
-					ID:       "id-1",
-					ExtPaths: nil,
+					ID:   "id-1",
+					Args: nil,
 				},
 			},
 			"id-2": {
 				StorageData: models.StorageData{
-					ID:       "id-2",
-					ExtPaths: nil,
+					ID:   "id-2",
+					Args: nil,
 				},
 			},
 		},
@@ -279,7 +279,7 @@ func (m *storageHdlMock) List(_ context.Context) ([]models.StorageData, error) {
 	return list, nil
 }
 
-func (m *storageHdlMock) Write(_ context.Context, id string, extPaths []string, data []byte) error {
+func (m *storageHdlMock) Write(_ context.Context, id string, args [][2]string, data []byte) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if m.Err != nil {
@@ -293,8 +293,8 @@ func (m *storageHdlMock) Write(_ context.Context, id string, extPaths []string, 
 		data []byte
 	}{
 		StorageData: models.StorageData{
-			ID:       id,
-			ExtPaths: extPaths,
+			ID:   id,
+			Args: args,
 		},
 		data: data,
 	}

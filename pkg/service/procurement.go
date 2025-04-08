@@ -124,7 +124,11 @@ func (s *Service) handleService(ctx context.Context, wg *sync.WaitGroup, service
 		logger.Warn("validating doc failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
 		return
 	}
-	if err = s.storageHdl.Write(ctx, service.ID, service.ExtPaths, doc); err != nil {
+	var args [][2]string
+	for _, path := range service.ExtPaths {
+		args = append(args, [2]string{extPathKey, path})
+	}
+	if err = s.storageHdl.Write(ctx, service.ID, args, doc); err != nil {
 		logger.Error("writing doc failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
 		return
 	}

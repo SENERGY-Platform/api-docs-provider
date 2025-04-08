@@ -32,13 +32,13 @@ func TestHandler(t *testing.T) {
 	tmpDir := t.TempDir()
 	hdl := New(tmpDir)
 	t.Run("write 1", func(t *testing.T) {
-		err := hdl.Write(context.Background(), "id-1", []string{"/a"}, []byte("test"))
+		err := hdl.Write(context.Background(), "id-1", [][2]string{{"key", "/a"}}, []byte("test"))
 		if err != nil {
 			t.Error(err)
 		}
 	})
 	t.Run("write 2", func(t *testing.T) {
-		err := hdl.Write(context.Background(), "id-2", []string{"/b"}, []byte("test"))
+		err := hdl.Write(context.Background(), "id-2", [][2]string{{"key", "/b"}}, []byte("test"))
 		if err != nil {
 			t.Error(err)
 		}
@@ -65,7 +65,7 @@ func TestHandler(t *testing.T) {
 		})
 		t.Run("write 3", func(t *testing.T) {
 			t.Parallel()
-			err := hdl.Write(context.Background(), "id-3", []string{"/c"}, []byte("test"))
+			err := hdl.Write(context.Background(), "id-3", [][2]string{{"key", "/c"}}, []byte("test"))
 			if err != nil {
 				t.Error(err)
 			}
@@ -79,7 +79,7 @@ func TestHandler(t *testing.T) {
 		})
 		t.Run("write 4", func(t *testing.T) {
 			t.Parallel()
-			err := hdl.Write(context.Background(), "id-4", []string{"/d"}, []byte("test"))
+			err := hdl.Write(context.Background(), "id-4", [][2]string{{"key", "/d"}}, []byte("test"))
 			if err != nil {
 				t.Error(err)
 			}
@@ -121,11 +121,11 @@ func TestHandler(t *testing.T) {
 				t.Error("expected item 'id-2' to be present")
 			}
 			i := models.StorageData{
-				ID:       "id-2",
-				ExtPaths: []string{"/b"},
+				ID:   "id-2",
+				Args: [][2]string{{"key", "/b"}},
 			}
 			if !reflect.DeepEqual(item.StorageData, i) {
-				t.Errorf("expected %v, got %v", i, item)
+				t.Errorf("expected %v, got %v", i, item.StorageData)
 			}
 		})
 		t.Run("3", func(t *testing.T) {
@@ -134,11 +134,11 @@ func TestHandler(t *testing.T) {
 				t.Error("expected item 'id-3' to be present")
 			}
 			i := models.StorageData{
-				ID:       "id-3",
-				ExtPaths: []string{"/c"},
+				ID:   "id-3",
+				Args: [][2]string{{"key", "/c"}},
 			}
 			if !reflect.DeepEqual(item.StorageData, i) {
-				t.Errorf("expected %v, got %v", i, item)
+				t.Errorf("expected %v, got %v", i, item.StorageData)
 			}
 		})
 		t.Run("4", func(t *testing.T) {
@@ -147,11 +147,11 @@ func TestHandler(t *testing.T) {
 				t.Error("expected item 'id-4' to be present")
 			}
 			i := models.StorageData{
-				ID:       "id-4",
-				ExtPaths: []string{"/d"},
+				ID:   "id-4",
+				Args: [][2]string{{"key", "/d"}},
 			}
 			if !reflect.DeepEqual(item.StorageData, i) {
-				t.Errorf("expected %v, got %v", i, item)
+				t.Errorf("expected %v, got %v", i, item.StorageData)
 			}
 		})
 	})
@@ -171,11 +171,11 @@ func TestHandler(t *testing.T) {
 					t.Error("expected item 'id-2' to be present")
 				}
 				i := models.StorageData{
-					ID:       "id-2",
-					ExtPaths: []string{"/b"},
+					ID:   "id-2",
+					Args: [][2]string{{"key", "/b"}},
 				}
 				if !reflect.DeepEqual(item.StorageData, i) {
-					t.Errorf("expected %v, got %v", i, item)
+					t.Errorf("expected %v, got %v", i, item.StorageData)
 				}
 			})
 			t.Run("3", func(t *testing.T) {
@@ -184,11 +184,11 @@ func TestHandler(t *testing.T) {
 					t.Error("expected item 'id-3' to be present")
 				}
 				i := models.StorageData{
-					ID:       "id-3",
-					ExtPaths: []string{"/c"},
+					ID:   "id-3",
+					Args: [][2]string{{"key", "/c"}},
 				}
 				if !reflect.DeepEqual(item.StorageData, i) {
-					t.Errorf("expected %v, got %v", i, item)
+					t.Errorf("expected %v, got %v", i, item.StorageData)
 				}
 			})
 			t.Run("4", func(t *testing.T) {
@@ -197,11 +197,11 @@ func TestHandler(t *testing.T) {
 					t.Error("expected item 'id-4' to be present")
 				}
 				i := models.StorageData{
-					ID:       "id-4",
-					ExtPaths: []string{"/d"},
+					ID:   "id-4",
+					Args: [][2]string{{"key", "/d"}},
 				}
 				if !reflect.DeepEqual(item.StorageData, i) {
-					t.Errorf("expected %v, got %v", i, item)
+					t.Errorf("expected %v, got %v", i, item.StorageData)
 				}
 			})
 		})
@@ -224,7 +224,7 @@ func TestHandler(t *testing.T) {
 		t.Run("path", func(t *testing.T) {
 			hdl.dirPath = "does-not-exist"
 			t.Run("write", func(t *testing.T) {
-				err := hdl.Write(context.Background(), "", []string{}, []byte(""))
+				err := hdl.Write(context.Background(), "", [][2]string{}, []byte(""))
 				if err == nil {
 					t.Error("expected error")
 				}

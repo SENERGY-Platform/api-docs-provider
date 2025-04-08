@@ -84,7 +84,7 @@ func (h *Handler) List(_ context.Context) ([]models.StorageData, error) {
 	return items, nil
 }
 
-func (h *Handler) Write(ctx context.Context, id string, extPaths []string, data []byte) error {
+func (h *Handler) Write(ctx context.Context, id string, args [][2]string, data []byte) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	var err error
@@ -110,7 +110,7 @@ func (h *Handler) Write(ctx context.Context, id string, extPaths []string, data 
 	}
 	oldDirName := item.dirName
 	item.dirName = newDirName
-	item.ExtPaths = extPaths
+	item.Args = args
 	dataFile, err := os.Create(path.Join(h.dirPath, newDirName, dataFileName))
 	if err != nil {
 		return models.NewInternalError(err)

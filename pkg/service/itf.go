@@ -27,7 +27,7 @@ type DiscoveryHandler interface {
 
 type StorageHandler interface {
 	List(ctx context.Context) ([]models.StorageData, error)
-	Write(ctx context.Context, id string, extPaths []string, data []byte) error
+	Write(ctx context.Context, id string, args [][2]string, data []byte) error
 	Read(ctx context.Context, id string) ([]byte, error)
 	Delete(ctx context.Context, id string) error
 }

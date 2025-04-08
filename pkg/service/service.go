@@ -33,6 +33,8 @@ import (
 	"time"
 )
 
+const extPathKey = "ext-path"
+
 type Service struct {
 	storageHdl    StorageHandler
 	discoveryHdl  DiscoveryHandler
@@ -104,7 +106,7 @@ func (s *Service) SwaggerDocs(ctx context.Context, userToken string, userRoles [
 				mu.Unlock()
 				logger.Debug("appended swagger doc", slog_attr.BasePathKey, basePath, slog_attr.RequestIDKey, reqID)
 			}
-		}(item.ID, item.ExtPaths)
+		}(item.ID, getExtPaths(item.Args))
 	}
 	wg.Wait()
 	slices.SortStableFunc(docWrappers, func(a, b docWrapper) int {
@@ -169,4 +171,13 @@ func stringInSlice(a string, sl []string) bool {
 		}
 	}
 	return false
+}
+
+func getExtPaths(args [][2]string) (extPaths []string) {
+	for _, arg := range args {
+		if arg[0] == extPathKey {
+			extPaths = append(extPaths, arg[1])
+		}
+	}
+	return
 }
