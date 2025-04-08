@@ -28,9 +28,8 @@ import (
 
 func TestHandler(t *testing.T) {
 	util.InitLogger(struct_logger.Config{}, os.Stderr, "", "")
-	InitLogger()
 	tmpDir := t.TempDir()
-	hdl := New(tmpDir)
+	hdl := New(tmpDir, "")
 	t.Run("write 1", func(t *testing.T) {
 		err := hdl.Write(context.Background(), "id-1", [][2]string{{"key", "/a"}}, []byte("test"))
 		if err != nil {
@@ -156,7 +155,7 @@ func TestHandler(t *testing.T) {
 		})
 	})
 	t.Run("init", func(t *testing.T) {
-		hdl2 := New(tmpDir)
+		hdl2 := New(tmpDir, "")
 		err := hdl2.Init(context.Background())
 		if err != nil {
 			t.Error(err)
