@@ -12,6 +12,178 @@
     },
     "basePath": "/",
     "paths": {
+        "/asyncapi/docs": {
+            "get": {
+                "description": "Get all asyncapi docs.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AsyncAPI"
+                ],
+                "summary": "Get docs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "Authorization",
+                        "in": "header"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "list of asyncapi docs",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/asyncapi/storage": {
+            "get": {
+                "description": "Get meta information of all stored items.",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AsyncAPI"
+                ],
+                "summary": "List storage",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "Authorization",
+                        "in": "header"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "stored items",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.AsyncapiItem"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/asyncapi/storage/{id}": {
+            "put": {
+                "description": "Store an asyncapi doc.",
+                "consumes": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "AsyncAPI"
+                ],
+                "summary": "Store doc",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "doc id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "doc",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Remove an asyncapi doc.",
+                "tags": [
+                    "AsyncAPI"
+                ],
+                "summary": "Delete doc",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "doc id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/info": {
             "get": {
                 "description": "Get basic service and runtime information.",
@@ -38,65 +210,16 @@
                 }
             }
         },
-        "/storage/list": {
-            "get": {
-                "description": "Get meta information of all stored items.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Storage"
-                ],
-                "summary": "List storage",
-                "responses": {
-                    "200": {
-                        "description": "stored items",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.StorageData"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "error message",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/storage/refresh": {
-            "patch": {
-                "description": "Trigger swagger docs refresh.",
-                "tags": [
-                    "Storage"
-                ],
-                "summary": "Refresh storage",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "500": {
-                        "description": "error message",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/swagger": {
             "get": {
-                "description": "Get all swagger documents.",
+                "description": "Get all swagger docs.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Swagger"
                 ],
-                "summary": "Get swagger docs",
+                "summary": "Get docs (deprecated)",
                 "parameters": [
                     {
                         "type": "string",
@@ -120,6 +243,98 @@
                                 "type": "object"
                             }
                         }
+                    },
+                    "500": {
+                        "description": "error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/swagger/docs": {
+            "get": {
+                "description": "Get all swagger docs.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Swagger"
+                ],
+                "summary": "Get docs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "user roles",
+                        "name": "X-User-Roles",
+                        "in": "header"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "list of swagger docs",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/swagger/storage": {
+            "get": {
+                "description": "Get meta information of all stored items.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Swagger"
+                ],
+                "summary": "List storage",
+                "responses": {
+                    "200": {
+                        "description": "stored items",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.SwaggerItem"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/swagger/storage-refresh": {
+            "patch": {
+                "description": "Trigger swagger docs refresh.",
+                "tags": [
+                    "Swagger"
+                ],
+                "summary": "Refresh storage",
+                "responses": {
+                    "200": {
+                        "description": "OK"
                     },
                     "500": {
                         "description": "error message",
@@ -166,7 +381,21 @@
                 }
             }
         },
-        "models.StorageData": {
+        "models.AsyncapiItem": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.SwaggerItem": {
             "type": "object",
             "properties": {
                 "ext_paths": {
@@ -177,46 +406,28 @@
                 },
                 "id": {
                     "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
                 }
             }
         },
         "time.Duration": {
             "type": "integer",
             "enum": [
-                -9223372036854775808,
-                9223372036854775807,
                 1,
                 1000,
                 1000000,
-                1000000000,
-                60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000
+                1000000000
             ],
             "x-enum-varnames": [
-                "minDuration",
-                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour"
+                "Second"
             ]
         }
     }
