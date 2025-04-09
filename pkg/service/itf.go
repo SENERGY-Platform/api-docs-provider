@@ -32,5 +32,5 @@ type asyncapiService interface {
 	AsyncapiGetDocs(ctx context.Context) ([]json.RawMessage, error)
 	AsyncapiPutDoc(ctx context.Context, id string, data []byte) error
 	AsyncapiDeleteDoc(ctx context.Context, id string) error
-	AsyncapiListStorage(ctx context.Context) ([]models.StorageData, error)
+	AsyncapiListStorage(ctx context.Context) ([]models.AsyncapiItem, error)
 }
