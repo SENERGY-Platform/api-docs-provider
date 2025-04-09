@@ -28,9 +28,10 @@ import (
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/kong_clt"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/ladon_clt"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/storage_hdl"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/swagger_hdl"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/config"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/service"
+	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/service/asyncapi_srv"
+	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/service/swagger_srv"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util/slog_attr"
 	"net/http"
@@ -59,28 +60,25 @@ func main() {
 	}
 
 	util.InitLogger(cfg.Logger, os.Stderr, "github.com/SENERGY-Platform", srvInfoHdl.GetName())
-	swagger_hdl.InitLogger()
 	discovery_hdl.InitLogger()
+	swagger_srv.InitLogger()
+	asyncapi_srv.InitLogger()
 
 	util.Logger.Info("starting service", slog_attr.VersionKey, srvInfoHdl.GetVersion())
 
 	util.Logger.Debug(sb_util.ToJsonStr(cfg))
 
 	swaggerStgHdl := storage_hdl.New(cfg.Storage.SwaggerDataPath, "swagger")
+	kongClt := kong_clt.New(&http.Client{Transport: http.DefaultTransport}, cfg.Discovery.Kong.BaseURL, cfg.Discovery.Kong.User, cfg.Discovery.Kong.Password.Value())
+	discoveryHdl := discovery_hdl.New(kongClt, cfg.HttpTimeout, cfg.Discovery.HostBlacklist)
+	docClt := doc_clt.New(&http.Client{Transport: http.DefaultTransport}, cfg.Procurement.SwaggerDocPath)
+	ladonClt := ladon_clt.New(&http.Client{Transport: http.DefaultTransport}, cfg.Filter.LadonBaseUrl)
+	swaggerSrv := swagger_srv.New(swaggerStgHdl, discoveryHdl, docClt, ladonClt, cfg.HttpTimeout, cfg.ApiGateway, cfg.Filter.AdminRoleName)
 
 	asyncapiStgHdl := storage_hdl.New(cfg.Storage.AsyncapiDataPath, "asyncapi")
+	asyncapiSrv := asyncapi_srv.New(asyncapiStgHdl)
 
-	kongClt := kong_clt.New(&http.Client{Transport: http.DefaultTransport}, cfg.Discovery.Kong.BaseURL, cfg.Discovery.Kong.User, cfg.Discovery.Kong.Password.Value())
-
-	discoveryHdl := discovery_hdl.New(kongClt, cfg.HttpTimeout, cfg.Discovery.HostBlacklist)
-
-	docClt := doc_clt.New(&http.Client{Transport: http.DefaultTransport}, cfg.Procurement.SwaggerDocPath)
-
-	ladonClt := ladon_clt.New(&http.Client{Transport: http.DefaultTransport}, cfg.Filter.LadonBaseUrl)
-
-	swaggerHdl := swagger_hdl.New(swaggerStgHdl, discoveryHdl, docClt, ladonClt, cfg.HttpTimeout, cfg.ApiGateway, cfg.Filter.AdminRoleName)
-
-	srv := service.New(swaggerHdl, srvInfoHdl)
+	srv := service.New(swaggerSrv, asyncapiSrv, srvInfoHdl)
 
 	httpHandler, err := api.New(srv, map[string]string{
 		api.HeaderApiVer:  srvInfoHdl.GetVersion(),
@@ -118,7 +116,7 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err := swaggerHdl.RunPeriodicProcurement(ctx, cfg.Procurement.Interval); err != nil {
+		if err := swaggerSrv.SwaggerPeriodicProcurement(ctx, cfg.Procurement.Interval); err != nil {
 			util.Logger.Error("periodic procurement failed", attributes.ErrorKey, err)
 			ec = 1
 		}

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package swagger_hdl
+package swagger_srv
 
 import (
 	"context"

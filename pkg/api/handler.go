@@ -45,7 +45,7 @@ func getSwaggerDocsH(srv Service) (string, string, gin.HandlerFunc) {
 		if val := gc.GetHeader(HeaderUserRoles); val != "" {
 			userRoles = strings.Split(val, ", ")
 		}
-		swaggerDocs, err := srv.SwaggerDocs(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)), gc.Request.Header.Get(HeaderAuthorization), userRoles)
+		swaggerDocs, err := srv.SwaggerGetDocs(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)), gc.Request.Header.Get(HeaderAuthorization), userRoles)
 		if err != nil {
 			_ = gc.Error(err)
 			return
@@ -63,7 +63,7 @@ func getSwaggerDocsH(srv Service) (string, string, gin.HandlerFunc) {
 // @Router /storage/refresh [patch]
 func patchStorageRefreshH(srv Service) (string, string, gin.HandlerFunc) {
 	return http.MethodPatch, "/storage/refresh", func(gc *gin.Context) {
-		err := srv.SwaggerStorageRefresh(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)))
+		err := srv.SwaggerRefreshDocs(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)))
 		if err != nil {
 			_ = gc.Error(err)
 			return
@@ -82,7 +82,7 @@ func patchStorageRefreshH(srv Service) (string, string, gin.HandlerFunc) {
 // @Router /storage/list [get]
 func getStorageListH(srv Service) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, "/storage/list", func(gc *gin.Context) {
-		list, err := srv.SwaggerStorageList(gc.Request.Context())
+		list, err := srv.SwaggerListStorage(gc.Request.Context())
 		if err != nil {
 			_ = gc.Error(err)
 			return
@@ -101,7 +101,7 @@ func getStorageListH(srv Service) (string, string, gin.HandlerFunc) {
 // @Router /info [get]
 func getInfoH(srv Service) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, "/info", func(gc *gin.Context) {
-		gc.JSON(http.StatusOK, srv.SrvInfo(gc.Request.Context()))
+		gc.JSON(http.StatusOK, srv.GetInfo())
 	}
 }
 

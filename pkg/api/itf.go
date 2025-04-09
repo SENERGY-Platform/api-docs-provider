@@ -19,14 +19,18 @@ package api
 import (
 	"context"
 	"encoding/json"
-	srv_info_lib "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl/lib"
+	srv_info_hdl "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
 )
 
 type Service interface {
-	SwaggerDocs(ctx context.Context, userToken string, userRoles []string) ([]map[string]json.RawMessage, error)
-	SwaggerStorageRefresh(ctx context.Context) error
-	SwaggerStorageList(ctx context.Context) ([]models.StorageData, error)
+	SwaggerGetDocs(ctx context.Context, userToken string, userRoles []string) ([]map[string]json.RawMessage, error)
+	SwaggerListStorage(ctx context.Context) ([]models.StorageData, error)
+	SwaggerRefreshDocs(ctx context.Context) error
+	AsyncapiGetDocs(ctx context.Context) ([]json.RawMessage, error)
+	AsyncapiPutDoc(ctx context.Context, id string, data []byte) error
+	AsyncapiDeleteDoc(ctx context.Context, id string) error
+	AsyncapiListStorage(ctx context.Context) ([]models.StorageData, error)
 	HealthCheck(ctx context.Context) error
-	SrvInfo(ctx context.Context) srv_info_lib.SrvInfo
+	srv_info_hdl.SrvInfoHandler
 }

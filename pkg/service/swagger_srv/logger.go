@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package swagger_hdl
+package swagger_srv
 
 import (
-	"context"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
+	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
+	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util/slog_attr"
+	"log/slog"
 )
 
-type DiscoveryHandler interface {
-	GetServices(ctx context.Context) (map[string]models.Service, error)
-}
+var logger *slog.Logger
 
-type StorageHandler interface {
-	List(ctx context.Context) ([]models.StorageData, error)
-	Write(ctx context.Context, id string, args [][2]string, data []byte) error
-	Read(ctx context.Context, id string) ([]byte, error)
-	Delete(ctx context.Context, id string) error
+func InitLogger() {
+	logger = util.Logger.With(slog_attr.ComponentKey, "swagger-srv")
 }

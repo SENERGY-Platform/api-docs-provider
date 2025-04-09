@@ -22,8 +22,15 @@ import (
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
 )
 
-type SwaggerHandler interface {
-	GetDocs(ctx context.Context, userToken string, userRoles []string) ([]map[string]json.RawMessage, error)
-	ListStorage(ctx context.Context) ([]models.StorageData, error)
-	RefreshStorage(ctx context.Context) error
+type swaggerService interface {
+	SwaggerGetDocs(ctx context.Context, userToken string, userRoles []string) ([]map[string]json.RawMessage, error)
+	SwaggerListStorage(ctx context.Context) ([]models.StorageData, error)
+	SwaggerRefreshDocs(ctx context.Context) error
+}
+
+type asyncapiService interface {
+	AsyncapiGetDocs(ctx context.Context) ([]json.RawMessage, error)
+	AsyncapiPutDoc(ctx context.Context, id string, data []byte) error
+	AsyncapiDeleteDoc(ctx context.Context, id string) error
+	AsyncapiListStorage(ctx context.Context) ([]models.StorageData, error)
 }

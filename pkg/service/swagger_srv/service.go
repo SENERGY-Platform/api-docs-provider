@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package swagger_hdl
+package swagger_srv
 
 import (
 	"context"
@@ -33,7 +33,7 @@ import (
 
 const extPathKey = "ext-path"
 
-type Handler struct {
+type Service struct {
 	storageHdl    StorageHandler
 	discoveryHdl  DiscoveryHandler
 	docClt        doc_clt.ClientItf
@@ -44,8 +44,8 @@ type Handler struct {
 	mu            sync.Mutex
 }
 
-func New(storageHdl StorageHandler, discoveryHdl DiscoveryHandler, docClt doc_clt.ClientItf, ladonClt ladon_clt.ClientItf, timeout time.Duration, apiGtwHost string, adminRoleName string) *Handler {
-	return &Handler{
+func New(storageHdl StorageHandler, discoveryHdl DiscoveryHandler, docClt doc_clt.ClientItf, ladonClt ladon_clt.ClientItf, timeout time.Duration, apiGtwHost string, adminRoleName string) *Service {
+	return &Service{
 		storageHdl:    storageHdl,
 		discoveryHdl:  discoveryHdl,
 		docClt:        docClt,
@@ -56,16 +56,16 @@ func New(storageHdl StorageHandler, discoveryHdl DiscoveryHandler, docClt doc_cl
 	}
 }
 
-func (h *Handler) GetDocs(ctx context.Context, userToken string, userRoles []string) ([]map[string]json.RawMessage, error) {
+func (s *Service) SwaggerGetDocs(ctx context.Context, userToken string, userRoles []string) ([]map[string]json.RawMessage, error) {
 	if userToken == "" && len(userRoles) == 0 {
 		return []map[string]json.RawMessage{}, nil
 	}
-	data, err := h.storageHdl.List(ctx)
+	data, err := s.storageHdl.List(ctx)
 	if err != nil {
 		return []map[string]json.RawMessage{}, models.NewInternalError(err)
 	}
 	reqID := util.GetReqID(ctx)
-	isAdmin := stringInSlice(h.adminRoleName, userRoles)
+	isAdmin := stringInSlice(s.adminRoleName, userRoles)
 	var docWrappers []docWrapper
 	wg := sync.WaitGroup{}
 	mu := sync.Mutex{}
@@ -73,24 +73,24 @@ func (h *Handler) GetDocs(ctx context.Context, userToken string, userRoles []str
 		wg.Add(1)
 		go func(id string, extPaths []string) {
 			defer wg.Done()
-			logger.Debug("reading swagger doc", slog_attr.ExternalPathsKey, extPaths, slog_attr.RequestIDKey, reqID)
-			rawDoc, err := h.storageHdl.Read(ctx, id)
+			logger.Debug("reading doc", slog_attr.ExternalPathsKey, extPaths, slog_attr.RequestIDKey, reqID)
+			rawDoc, err := s.storageHdl.Read(ctx, id)
 			if err != nil {
-				logger.Error("reading swagger doc failed", slog_attr.ExternalPathsKey, extPaths, attributes.ErrorKey, err.Error(), slog_attr.RequestIDKey, reqID)
+				logger.Error("reading doc failed", slog_attr.ExternalPathsKey, extPaths, attributes.ErrorKey, err.Error(), slog_attr.RequestIDKey, reqID)
 				return
 			}
 			for _, basePath := range extPaths {
-				logger.Debug("transforming swagger doc'", slog_attr.BasePathKey, basePath, slog_attr.RequestIDKey, reqID)
-				doc, err := h.transformDoc(rawDoc, basePath)
+				logger.Debug("transforming doc'", slog_attr.BasePathKey, basePath, slog_attr.RequestIDKey, reqID)
+				doc, err := s.transformDoc(rawDoc, basePath)
 				if err != nil {
-					logger.Error("transforming swagger doc failed", slog_attr.BasePathKey, basePath, attributes.ErrorKey, err.Error(), slog_attr.RequestIDKey, reqID)
+					logger.Error("transforming doc failed", slog_attr.BasePathKey, basePath, attributes.ErrorKey, err.Error(), slog_attr.RequestIDKey, reqID)
 					continue
 				}
 				if !isAdmin {
-					logger.Debug("filtering swagger doc", slog_attr.BasePathKey, basePath, slog_attr.RequestIDKey, reqID)
-					ok, err := h.filterDoc(ctx, doc, userToken, userRoles, basePath)
+					logger.Debug("filtering doc", slog_attr.BasePathKey, basePath, slog_attr.RequestIDKey, reqID)
+					ok, err := s.filterDoc(ctx, doc, userToken, userRoles, basePath)
 					if err != nil {
-						logger.Error("filtering swagger doc failed", slog_attr.BasePathKey, basePath, attributes.ErrorKey, err.Error(), slog_attr.RequestIDKey, reqID)
+						logger.Error("filtering doc failed", slog_attr.BasePathKey, basePath, attributes.ErrorKey, err.Error(), slog_attr.RequestIDKey, reqID)
 						continue
 					}
 					if !ok {
@@ -100,7 +100,7 @@ func (h *Handler) GetDocs(ctx context.Context, userToken string, userRoles []str
 				mu.Lock()
 				docWrappers = append(docWrappers, docWrapper{basePath: basePath, doc: doc})
 				mu.Unlock()
-				logger.Debug("appended swagger doc", slog_attr.BasePathKey, basePath, slog_attr.RequestIDKey, reqID)
+				logger.Debug("appended doc", slog_attr.BasePathKey, basePath, slog_attr.RequestIDKey, reqID)
 			}
 		}(item.ID, getExtPaths(item.Args))
 	}
@@ -115,21 +115,21 @@ func (h *Handler) GetDocs(ctx context.Context, userToken string, userRoles []str
 	return docs, nil
 }
 
-func (h *Handler) ListStorage(ctx context.Context) ([]models.StorageData, error) {
-	items, err := h.storageHdl.List(ctx)
+func (s *Service) SwaggerListStorage(ctx context.Context) ([]models.StorageData, error) {
+	items, err := s.storageHdl.List(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return items, nil
 }
 
-func (h *Handler) transformDoc(rawDoc []byte, basePath string) (map[string]json.RawMessage, error) {
+func (s *Service) transformDoc(rawDoc []byte, basePath string) (map[string]json.RawMessage, error) {
 	var doc map[string]json.RawMessage
 	err := json.Unmarshal(rawDoc, &doc)
 	if err != nil {
 		return nil, models.NewInternalError(err)
 	}
-	b, err := json.Marshal(h.apiGtwHost)
+	b, err := json.Marshal(s.apiGtwHost)
 	if err != nil {
 		return nil, models.NewInternalError(err)
 	}

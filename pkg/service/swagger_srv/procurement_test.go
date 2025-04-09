@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package swagger_hdl
+package swagger_srv
 
 import (
 	"context"
@@ -108,7 +108,7 @@ func TestHandler_RefreshStorage(t *testing.T) {
 	util.InitLogger(struct_logger.Config{}, os.Stderr, "", "")
 	InitLogger()
 	srv := New(storageHdl, discoveryHdl, docClt, nil, 0, "", "")
-	err = srv.RefreshStorage(context.Background())
+	err = srv.SwaggerRefreshDocs(context.Background())
 	if err != nil {
 		t.Error(err)
 	}

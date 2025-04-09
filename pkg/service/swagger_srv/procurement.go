@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package swagger_hdl
+package swagger_srv
 
 import (
 	"context"
@@ -30,7 +30,7 @@ import (
 	"time"
 )
 
-func (h *Handler) RunPeriodicProcurement(ctx context.Context, interval time.Duration) error {
+func (s *Service) SwaggerPeriodicProcurement(ctx context.Context, interval time.Duration) error {
 	logger.Info("starting periodic procurement")
 	var lErr error
 	defer func() {
@@ -45,7 +45,7 @@ func (h *Handler) RunPeriodicProcurement(ctx context.Context, interval time.Dura
 	for loop {
 		select {
 		case <-timer.C:
-			err := h.RefreshStorage(ctx)
+			err := s.SwaggerRefreshDocs(ctx)
 			if err != nil {
 				var rbe *models.ResourceBusyError
 				if !errors.As(err, &rbe) {
@@ -68,12 +68,12 @@ func (h *Handler) RunPeriodicProcurement(ctx context.Context, interval time.Dura
 	return lErr
 }
 
-func (h *Handler) RefreshStorage(ctx context.Context) error {
-	if !h.mu.TryLock() {
+func (s *Service) SwaggerRefreshDocs(ctx context.Context) error {
+	if !s.mu.TryLock() {
 		return models.NewResourceBusyError(errors.New("procurement running"))
 	}
-	defer h.mu.Unlock()
-	services, err := h.discoveryHdl.GetServices(ctx)
+	defer s.mu.Unlock()
+	services, err := s.discoveryHdl.GetServices(ctx)
 	if err != nil {
 		return models.NewInternalError(err)
 	}
@@ -84,24 +84,24 @@ func (h *Handler) RefreshStorage(ctx context.Context) error {
 		}
 		if len(service.ExtPaths) > 0 {
 			wg.Add(1)
-			go h.handleService(ctx, wg, service)
+			go s.handleService(ctx, wg, service)
 		}
 	}
 	wg.Wait()
-	if err = h.cleanOldServices(ctx, services); err != nil {
+	if err = s.cleanOldServices(ctx, services); err != nil {
 		logger.Error("removing old docs failed", attributes.ErrorKey, err, slog_attr.RequestIDKey, util.GetReqID(ctx))
 	}
 	return nil
 }
 
-func (h *Handler) cleanOldServices(ctx context.Context, services map[string]models.Service) error {
-	storedServices, err := h.storageHdl.List(ctx)
+func (s *Service) cleanOldServices(ctx context.Context, services map[string]models.Service) error {
+	storedServices, err := s.storageHdl.List(ctx)
 	if err != nil {
 		return err
 	}
 	for _, service := range storedServices {
 		if _, ok := services[service.ID]; !ok {
-			if err = h.storageHdl.Delete(ctx, service.ID); err != nil {
+			if err = s.storageHdl.Delete(ctx, service.ID); err != nil {
 				logger.Error("removing old doc failed", attributes.ErrorKey, err, slog_attr.RequestIDKey, util.GetReqID(ctx))
 			}
 		}
@@ -109,13 +109,13 @@ func (h *Handler) cleanOldServices(ctx context.Context, services map[string]mode
 	return nil
 }
 
-func (h *Handler) handleService(ctx context.Context, wg *sync.WaitGroup, service models.Service) {
+func (s *Service) handleService(ctx context.Context, wg *sync.WaitGroup, service models.Service) {
 	defer wg.Done()
-	ctxWt, cf := context.WithTimeout(ctx, h.timeout)
+	ctxWt, cf := context.WithTimeout(ctx, s.timeout)
 	defer cf()
 	reqID := util.GetReqID(ctx)
 	logger.Debug("probing host", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, slog_attr.RequestIDKey, reqID)
-	doc, err := h.docClt.GetDoc(ctxWt, service.Protocol, service.Host, service.Port)
+	doc, err := s.docClt.GetDoc(ctxWt, service.Protocol, service.Host, service.Port)
 	if err != nil {
 		logger.Debug("probing host failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
 		return
@@ -128,7 +128,7 @@ func (h *Handler) handleService(ctx context.Context, wg *sync.WaitGroup, service
 	for _, path := range service.ExtPaths {
 		args = append(args, [2]string{extPathKey, path})
 	}
-	if err = h.storageHdl.Write(ctx, service.ID, args, doc); err != nil {
+	if err = s.storageHdl.Write(ctx, service.ID, args, doc); err != nil {
 		logger.Error("writing doc failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
 		return
 	}
