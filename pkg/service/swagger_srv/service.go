@@ -31,7 +31,11 @@ import (
 	"time"
 )
 
-const extPathKey = "ext-path"
+const (
+	extPathArgKey = "ext-path"
+	titleArgKey   = "title"
+	versionArgKey = "version"
+)
 
 type Service struct {
 	storageHdl    StorageHandler
@@ -115,12 +119,16 @@ func (s *Service) SwaggerGetDocs(ctx context.Context, userToken string, userRole
 	return docs, nil
 }
 
-func (s *Service) SwaggerListStorage(ctx context.Context) ([]models.StorageData, error) {
-	items, err := s.storageHdl.List(ctx)
+func (s *Service) SwaggerListStorage(ctx context.Context) ([]models.SwaggerItem, error) {
+	storageItems, err := s.storageHdl.List(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return items, nil
+	var swaggerItems []models.SwaggerItem
+	for _, storageItem := range storageItems {
+		swaggerItems = append(swaggerItems, newSwaggerItem(storageItem))
+	}
+	return swaggerItems, nil
 }
 
 func (s *Service) transformDoc(rawDoc []byte, basePath string) (map[string]json.RawMessage, error) {
@@ -160,9 +168,24 @@ func stringInSlice(a string, sl []string) bool {
 
 func getExtPaths(args [][2]string) (extPaths []string) {
 	for _, arg := range args {
-		if arg[0] == extPathKey {
+		if arg[0] == extPathArgKey {
 			extPaths = append(extPaths, arg[1])
 		}
 	}
 	return
+}
+
+func newSwaggerItem(sd models.StorageData) models.SwaggerItem {
+	si := models.SwaggerItem{ID: sd.ID}
+	for _, arg := range sd.Args {
+		switch arg[0] {
+		case extPathArgKey:
+			si.ExtPaths = append(si.ExtPaths, arg[1])
+		case titleArgKey:
+			si.Title = arg[1]
+		case versionArgKey:
+			si.Version = arg[1]
+		}
+	}
+	return si
 }

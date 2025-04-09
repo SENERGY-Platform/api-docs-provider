@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"github.com/SENERGY-Platform/go-service-base/struct-logger/attributes"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
+	srv_util "github.com/SENERGY-Platform/swagger-docs-provider/pkg/service/util"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
 	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util/slog_attr"
 	"runtime/debug"
@@ -124,9 +125,17 @@ func (s *Service) handleService(ctx context.Context, wg *sync.WaitGroup, service
 		logger.Warn("validating doc failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
 		return
 	}
-	var args [][2]string
+	title, version, err := getSwaggerInfo(doc)
+	if err != nil {
+		logger.Warn("extracting info failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
+		return
+	}
+	args := [][2]string{
+		{titleArgKey, title},
+		{versionArgKey, version},
+	}
 	for _, path := range service.ExtPaths {
-		args = append(args, [2]string{extPathKey, path})
+		args = append(args, [2]string{extPathArgKey, path})
 	}
 	if err = s.storageHdl.Write(ctx, service.ID, args, doc); err != nil {
 		logger.Error("writing doc failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
@@ -139,18 +148,16 @@ func validateDoc(doc []byte) error {
 	if err := json.Unmarshal(doc, &tmp); err != nil {
 		return err
 	}
-	if !checkForKeys(tmp, swaggerV2Keys) && !checkForKeys(tmp, swaggerV3Keys) {
+	if !srv_util.CheckForKeys(tmp, swaggerV2Keys) && !srv_util.CheckForKeys(tmp, swaggerV3Keys) {
 		return errors.New("missing required keys")
 	}
 	return nil
 }
 
-func checkForKeys(doc map[string]json.RawMessage, keys []string) bool {
-	c := 0
-	for _, key := range keys {
-		if _, ok := doc[key]; ok {
-			c++
-		}
+func getSwaggerInfo(doc []byte) (string, string, error) {
+	var info swaggerInfo
+	if err := json.Unmarshal(doc, &info); err != nil {
+		return "", "", err
 	}
-	return c == len(keys)
+	return info.Info.Title, info.Info.Version, nil
 }

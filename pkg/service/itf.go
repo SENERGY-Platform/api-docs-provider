@@ -24,7 +24,7 @@ import (
 
 type swaggerService interface {
 	SwaggerGetDocs(ctx context.Context, userToken string, userRoles []string) ([]map[string]json.RawMessage, error)
-	SwaggerListStorage(ctx context.Context) ([]models.StorageData, error)
+	SwaggerListStorage(ctx context.Context) ([]models.SwaggerItem, error)
 	SwaggerRefreshDocs(ctx context.Context) error
 }
 

@@ -31,11 +31,7 @@ import (
 )
 
 func TestHandler_RefreshStorage(t *testing.T) {
-	validDoc, err := json.Marshal(map[string]json.RawMessage{
-		"swagger": nil,
-		"info":    nil,
-		"paths":   nil,
-	})
+	validDoc, err := os.ReadFile("test/swagger.json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -47,14 +43,14 @@ func TestHandler_RefreshStorage(t *testing.T) {
 			"ph0": {
 				StorageData: models.StorageData{
 					ID:   "ph0",
-					Args: [][2]string{{extPathKey, "/x"}},
+					Args: [][2]string{{extPathArgKey, "/x"}},
 				},
 				data: validDoc,
 			},
 			"ph9": {
 				StorageData: models.StorageData{
 					ID:   "ph9",
-					Args: [][2]string{{extPathKey, "/t"}},
+					Args: [][2]string{{extPathArgKey, "/t"}},
 				},
 				data: validDoc,
 			},
@@ -118,15 +114,23 @@ func TestHandler_RefreshStorage(t *testing.T) {
 	}{
 		"ph0": {
 			StorageData: models.StorageData{
-				ID:   "ph0",
-				Args: [][2]string{{extPathKey, "/t"}},
+				ID: "ph0",
+				Args: [][2]string{
+					{titleArgKey, "Test"},
+					{versionArgKey, "v1"},
+					{extPathArgKey, "/t"},
+				},
 			},
 			data: validDoc,
 		},
 		"ph1": {
 			StorageData: models.StorageData{
-				ID:   "ph1",
-				Args: [][2]string{{extPathKey, "/t"}},
+				ID: "ph1",
+				Args: [][2]string{
+					{titleArgKey, "Test"},
+					{versionArgKey, "v1"},
+					{extPathArgKey, "/t"},
+				},
 			},
 			data: validDoc,
 		},
