@@ -25,12 +25,12 @@ import (
 
 type Service interface {
 	SwaggerGetDocs(ctx context.Context, userToken string, userRoles []string) ([]map[string]json.RawMessage, error)
-	SwaggerListStorage(ctx context.Context) ([]models.StorageData, error)
+	SwaggerListStorage(ctx context.Context) ([]models.SwaggerItem, error)
 	SwaggerRefreshDocs(ctx context.Context) error
 	AsyncapiGetDocs(ctx context.Context) ([]json.RawMessage, error)
 	AsyncapiPutDoc(ctx context.Context, id string, data []byte) error
 	AsyncapiDeleteDoc(ctx context.Context, id string) error
-	AsyncapiListStorage(ctx context.Context) ([]models.StorageData, error)
+	AsyncapiListStorage(ctx context.Context) ([]models.AsyncapiItem, error)
 	HealthCheck(ctx context.Context) error
 	srv_info_hdl.SrvInfoHandler
 }

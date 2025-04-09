@@ -29,7 +29,7 @@ import (
 	"strings"
 )
 
-// getSwaggerDocsH godoc
+// getSwaggerGetDocsH godoc
 // @Summary Get swagger docs
 // @Description Get all swagger documents.
 // @Tags Swagger
@@ -39,7 +39,7 @@ import (
 // @Success	200 {array} object "list of swagger docs"
 // @Failure	500 {string} string "error message"
 // @Router /swagger [get]
-func getSwaggerDocsH(srv Service) (string, string, gin.HandlerFunc) {
+func getSwaggerGetDocsH(srv Service) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, "/swagger", func(gc *gin.Context) {
 		var userRoles []string
 		if val := gc.GetHeader(HeaderUserRoles); val != "" {
@@ -54,15 +54,15 @@ func getSwaggerDocsH(srv Service) (string, string, gin.HandlerFunc) {
 	}
 }
 
-// patchStorageRefreshH godoc
+// patchSwaggerRefreshDocsH godoc
 // @Summary Refresh storage
 // @Description Trigger swagger docs refresh.
 // @Tags Storage
 // @Success	200
 // @Failure	500 {string} string "error message"
 // @Router /storage/refresh [patch]
-func patchStorageRefreshH(srv Service) (string, string, gin.HandlerFunc) {
-	return http.MethodPatch, "/storage/refresh", func(gc *gin.Context) {
+func patchSwaggerRefreshDocsH(srv Service) (string, string, gin.HandlerFunc) {
+	return http.MethodPatch, "/storage/swagger/refresh", func(gc *gin.Context) {
 		err := srv.SwaggerRefreshDocs(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)))
 		if err != nil {
 			_ = gc.Error(err)
@@ -72,16 +72,16 @@ func patchStorageRefreshH(srv Service) (string, string, gin.HandlerFunc) {
 	}
 }
 
-// getStorageListH godoc
+// getSwaggerListStorageH godoc
 // @Summary List storage
 // @Description Get meta information of all stored items.
 // @Tags Storage
 // @Produce	json
-// @Success	200 {array} models.StorageData "stored items"
+// @Success	200 {array} models.SwaggerItem "stored items"
 // @Failure	500 {string} string "error message"
 // @Router /storage/list [get]
-func getStorageListH(srv Service) (string, string, gin.HandlerFunc) {
-	return http.MethodGet, "/storage/list", func(gc *gin.Context) {
+func getSwaggerListStorageH(srv Service) (string, string, gin.HandlerFunc) {
+	return http.MethodGet, "/storage/swagger/list", func(gc *gin.Context) {
 		list, err := srv.SwaggerListStorage(gc.Request.Context())
 		if err != nil {
 			_ = gc.Error(err)
