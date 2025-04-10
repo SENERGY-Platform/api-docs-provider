@@ -1,4 +1,4 @@
-module github.com/SENERGY-Platform/api-docs-provider/lib
+module github.com/SENERGY-Platform/api-docs-provider/lib/client
 
 go 1.24
 
