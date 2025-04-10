@@ -32,6 +32,31 @@ import (
 	"strings"
 )
 
+// getSwaggerGetDocsOldH godoc
+// @Summary Get docs (deprecated)
+// @Description Get all swagger docs.
+// @Tags Swagger
+// @Produce	json
+// @Param Authorization header string false "jwt token"
+// @Param X-User-Roles header string false "user roles"
+// @Success	200 {array} object "list of swagger docs"
+// @Failure	500 {string} string "error message"
+// @Router /swagger [get]
+func getSwaggerGetDocsOldH(srv Service) (string, string, gin.HandlerFunc) {
+	return http.MethodGet, "/swagger", func(gc *gin.Context) {
+		var userRoles []string
+		if val := gc.GetHeader(HeaderUserRoles); val != "" {
+			userRoles = strings.Split(val, ", ")
+		}
+		docs, err := srv.SwaggerGetDocs(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)), gc.Request.Header.Get(HeaderAuthorization), userRoles)
+		if err != nil {
+			_ = gc.Error(err)
+			return
+		}
+		gc.JSON(http.StatusOK, docs)
+	}
+}
+
 // getSwaggerGetDocsH godoc
 // @Summary Get docs
 // @Description Get all swagger docs.
