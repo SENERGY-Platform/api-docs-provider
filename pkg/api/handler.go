@@ -19,6 +19,7 @@ package api
 import (
 	"context"
 	"errors"
+	lib_models "github.com/SENERGY-Platform/api-docs-provider/lib/models"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/models"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/util"
 	"github.com/SENERGY-Platform/go-service-base/struct-logger/attributes"
@@ -149,7 +150,7 @@ func putAsyncapiPutDocH(srv Service) (string, string, gin.HandlerFunc) {
 	return http.MethodPut, "/storage/asyncapi/:id", func(gc *gin.Context) {
 		id := gc.Param("id")
 		if id == "" {
-			_ = gc.Error(models.NewInvalidInputError(errors.New("id is required")))
+			_ = gc.Error(lib_models.NewInvalidInputError(errors.New("id is required")))
 			return
 		}
 		data, err := io.ReadAll(gc.Request.Body)
@@ -181,7 +182,7 @@ func deleteAsyncapiDeleteDocH(srv Service) (string, string, gin.HandlerFunc) {
 	return http.MethodDelete, "/storage/asyncapi/:id", func(gc *gin.Context) {
 		id := gc.Param("id")
 		if id == "" {
-			_ = gc.Error(models.NewInvalidInputError(errors.New("id is required")))
+			_ = gc.Error(lib_models.NewInvalidInputError(errors.New("id is required")))
 			return
 		}
 		err := srv.AsyncapiDeleteDoc(gc.Request.Context(), id)

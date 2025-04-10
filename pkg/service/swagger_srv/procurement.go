@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	lib_models "github.com/SENERGY-Platform/api-docs-provider/lib/models"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/models"
 	srv_util "github.com/SENERGY-Platform/api-docs-provider/pkg/service/util"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/util"
@@ -48,7 +49,7 @@ func (s *Service) SwaggerPeriodicProcurement(ctx context.Context, interval time.
 		case <-timer.C:
 			err := s.SwaggerRefreshDocs(ctx)
 			if err != nil {
-				var rbe *models.ResourceBusyError
+				var rbe *lib_models.ResourceBusyError
 				if !errors.As(err, &rbe) {
 					logger.Error("procurement failed", attributes.ErrorKey, err)
 				}
@@ -71,12 +72,12 @@ func (s *Service) SwaggerPeriodicProcurement(ctx context.Context, interval time.
 
 func (s *Service) SwaggerRefreshDocs(ctx context.Context) error {
 	if !s.mu.TryLock() {
-		return models.NewResourceBusyError(errors.New("procurement running"))
+		return lib_models.NewResourceBusyError(errors.New("procurement running"))
 	}
 	defer s.mu.Unlock()
 	services, err := s.discoveryHdl.GetServices(ctx)
 	if err != nil {
-		return models.NewInternalError(err)
+		return lib_models.NewInternalError(err)
 	}
 	wg := &sync.WaitGroup{}
 	for _, service := range services {

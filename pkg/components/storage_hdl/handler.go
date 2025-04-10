@@ -21,6 +21,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	lib_models "github.com/SENERGY-Platform/api-docs-provider/lib/models"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/models"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/util"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/util/slog_attr"
@@ -98,11 +99,11 @@ func (h *Handler) Write(ctx context.Context, id string, args [][2]string, data [
 	var err error
 	newDirName, err := genDirName()
 	if err != nil {
-		return models.NewInternalError(err)
+		return lib_models.NewInternalError(err)
 	}
 	err = os.Mkdir(path.Join(h.dirPath, newDirName), 0770)
 	if err != nil {
-		return models.NewInternalError(err)
+		return lib_models.NewInternalError(err)
 	}
 	reqID := util.GetReqID(ctx)
 	defer func() {
@@ -121,24 +122,24 @@ func (h *Handler) Write(ctx context.Context, id string, args [][2]string, data [
 	item.Args = args
 	dataFile, err := os.Create(path.Join(h.dirPath, newDirName, dataFileName))
 	if err != nil {
-		return models.NewInternalError(err)
+		return lib_models.NewInternalError(err)
 	}
 	defer dataFile.Close()
 	err = json.NewEncoder(dataFile).Encode(item)
 	if err != nil {
-		return models.NewInternalError(err)
+		return lib_models.NewInternalError(err)
 	}
 	docFile, err := os.Create(path.Join(h.dirPath, newDirName, docFileName))
 	if err != nil {
-		return models.NewInternalError(err)
+		return lib_models.NewInternalError(err)
 	}
 	defer docFile.Close()
 	n, err := docFile.ReadFrom(bytes.NewReader(data))
 	if err != nil {
-		return models.NewInternalError(err)
+		return lib_models.NewInternalError(err)
 	}
 	if n == 0 {
-		err = models.NewInternalError(errors.New("0 bytes written"))
+		err = lib_models.NewInternalError(errors.New("0 bytes written"))
 		return err
 	}
 	h.items[id] = item
@@ -156,11 +157,11 @@ func (h *Handler) Read(_ context.Context, id string) ([]byte, error) {
 	defer h.mu.RUnlock()
 	item, ok := h.items[id]
 	if !ok {
-		return nil, models.NewNotFoundError(errors.New("not found"))
+		return nil, lib_models.NewNotFoundError(errors.New("not found"))
 	}
 	doc, err := readDoc(path.Join(h.dirPath, item.dirName, docFileName))
 	if err != nil {
-		return nil, models.NewInternalError(err)
+		return nil, lib_models.NewInternalError(err)
 	}
 	return doc, nil
 }
@@ -170,11 +171,11 @@ func (h *Handler) Delete(_ context.Context, id string) error {
 	defer h.mu.Unlock()
 	item, ok := h.items[id]
 	if !ok {
-		return models.NewNotFoundError(errors.New("not found"))
+		return lib_models.NewNotFoundError(errors.New("not found"))
 	}
 	err := os.RemoveAll(path.Join(h.dirPath, item.dirName))
 	if err != nil {
-		return models.NewInternalError(err)
+		return lib_models.NewInternalError(err)
 	}
 	delete(h.items, id)
 	return nil

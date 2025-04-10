@@ -20,6 +20,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	lib_models "github.com/SENERGY-Platform/api-docs-provider/lib/models"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/models"
 	srv_util "github.com/SENERGY-Platform/api-docs-provider/pkg/service/util"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/util"
@@ -46,7 +47,7 @@ func New(storageHdl StorageHandler) *Service {
 func (s *Service) AsyncapiGetDocs(ctx context.Context) ([]json.RawMessage, error) {
 	items, err := s.storageHdl.List(ctx)
 	if err != nil {
-		return []json.RawMessage{}, models.NewInternalError(err)
+		return []json.RawMessage{}, lib_models.NewInternalError(err)
 	}
 	reqID := util.GetReqID(ctx)
 	var docs []json.RawMessage
@@ -81,12 +82,12 @@ func (s *Service) AsyncapiPutDoc(ctx context.Context, id string, data []byte) er
 	reqID := util.GetReqID(ctx)
 	if err := validateDoc(data); err != nil {
 		logger.Error("validating doc failed", slog_attr.IDKey, id, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
-		return models.NewInvalidInputError(err)
+		return lib_models.NewInvalidInputError(err)
 	}
 	title, version, err := getAsyncapiInfo(data)
 	if err != nil {
 		logger.Error("extracting info failed", slog_attr.IDKey, id, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
-		return models.NewInternalError(err)
+		return lib_models.NewInternalError(err)
 	}
 	return s.storageHdl.Write(ctx, id, [][2]string{
 		{titleArgKey, title},
@@ -98,20 +99,20 @@ func (s *Service) AsyncapiDeleteDoc(ctx context.Context, id string) error {
 	return s.storageHdl.Delete(ctx, id)
 }
 
-func (s *Service) AsyncapiListStorage(ctx context.Context) ([]models.AsyncapiItem, error) {
+func (s *Service) AsyncapiListStorage(ctx context.Context) ([]lib_models.AsyncapiItem, error) {
 	storageItems, err := s.storageHdl.List(ctx)
 	if err != nil {
 		return nil, err
 	}
-	var asyncapiItems []models.AsyncapiItem
+	var asyncapiItems []lib_models.AsyncapiItem
 	for _, storageItem := range storageItems {
 		asyncapiItems = append(asyncapiItems, newAsyncapiItem(storageItem))
 	}
 	return asyncapiItems, nil
 }
 
-func newAsyncapiItem(sd models.StorageData) models.AsyncapiItem {
-	ai := models.AsyncapiItem{ID: sd.ID}
+func newAsyncapiItem(sd models.StorageData) lib_models.AsyncapiItem {
+	ai := lib_models.AsyncapiItem{ID: sd.ID}
 	for _, arg := range sd.Args {
 		switch arg[0] {
 		case titleArgKey:

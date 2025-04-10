@@ -19,6 +19,7 @@ package discovery_hdl
 import (
 	"context"
 	"fmt"
+	lib_models "github.com/SENERGY-Platform/api-docs-provider/lib/models"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/components/kong_clt"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/models"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/util/slog_attr"
@@ -48,13 +49,13 @@ func (h *Handler) GetServices(ctx context.Context) (map[string]models.Service, e
 	defer cf()
 	kRoutes, err := h.kongClient.GetRoutes(ctxWt)
 	if err != nil {
-		return nil, models.NewInternalError(err)
+		return nil, lib_models.NewInternalError(err)
 	}
 	ctxWt2, cf2 := context.WithTimeout(ctx, h.timeout)
 	defer cf2()
 	kServices, err := h.kongClient.GetServices(ctxWt2)
 	if err != nil {
-		return nil, models.NewInternalError(err)
+		return nil, lib_models.NewInternalError(err)
 	}
 	kSrvMap := getKongSrvMap(kServices)
 	services := make(map[string]models.Service)

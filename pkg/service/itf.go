@@ -19,12 +19,12 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"github.com/SENERGY-Platform/api-docs-provider/pkg/models"
+	lib_models "github.com/SENERGY-Platform/api-docs-provider/lib/models"
 )
 
 type swaggerService interface {
 	SwaggerGetDocs(ctx context.Context, userToken string, userRoles []string) ([]map[string]json.RawMessage, error)
-	SwaggerListStorage(ctx context.Context) ([]models.SwaggerItem, error)
+	SwaggerListStorage(ctx context.Context) ([]lib_models.SwaggerItem, error)
 	SwaggerRefreshDocs(ctx context.Context) error
 }
 
@@ -32,5 +32,5 @@ type asyncapiService interface {
 	AsyncapiGetDocs(ctx context.Context) ([]json.RawMessage, error)
 	AsyncapiPutDoc(ctx context.Context, id string, data []byte) error
 	AsyncapiDeleteDoc(ctx context.Context, id string) error
-	AsyncapiListStorage(ctx context.Context) ([]models.AsyncapiItem, error)
+	AsyncapiListStorage(ctx context.Context) ([]lib_models.AsyncapiItem, error)
 }

@@ -19,6 +19,7 @@ package swagger_srv
 import (
 	"context"
 	"encoding/json"
+	lib_models "github.com/SENERGY-Platform/api-docs-provider/lib/models"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/components/doc_clt"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/components/ladon_clt"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/models"
@@ -66,7 +67,7 @@ func (s *Service) SwaggerGetDocs(ctx context.Context, userToken string, userRole
 	}
 	data, err := s.storageHdl.List(ctx)
 	if err != nil {
-		return []map[string]json.RawMessage{}, models.NewInternalError(err)
+		return []map[string]json.RawMessage{}, lib_models.NewInternalError(err)
 	}
 	reqID := util.GetReqID(ctx)
 	isAdmin := stringInSlice(s.adminRoleName, userRoles)
@@ -119,12 +120,12 @@ func (s *Service) SwaggerGetDocs(ctx context.Context, userToken string, userRole
 	return docs, nil
 }
 
-func (s *Service) SwaggerListStorage(ctx context.Context) ([]models.SwaggerItem, error) {
+func (s *Service) SwaggerListStorage(ctx context.Context) ([]lib_models.SwaggerItem, error) {
 	storageItems, err := s.storageHdl.List(ctx)
 	if err != nil {
 		return nil, err
 	}
-	var swaggerItems []models.SwaggerItem
+	var swaggerItems []lib_models.SwaggerItem
 	for _, storageItem := range storageItems {
 		swaggerItems = append(swaggerItems, newSwaggerItem(storageItem))
 	}
@@ -135,22 +136,22 @@ func (s *Service) transformDoc(rawDoc []byte, basePath string) (map[string]json.
 	var doc map[string]json.RawMessage
 	err := json.Unmarshal(rawDoc, &doc)
 	if err != nil {
-		return nil, models.NewInternalError(err)
+		return nil, lib_models.NewInternalError(err)
 	}
 	b, err := json.Marshal(s.apiGtwHost)
 	if err != nil {
-		return nil, models.NewInternalError(err)
+		return nil, lib_models.NewInternalError(err)
 	}
 	doc[swaggerHostKey] = b
 	b, err = json.Marshal(basePath)
 	if err != nil {
-		return nil, models.NewInternalError(err)
+		return nil, lib_models.NewInternalError(err)
 	}
 	doc[swaggerBasePathKey] = b
 	if _, ok := doc[swaggerSchemesKey]; !ok {
 		b, err = json.Marshal([]string{"https"})
 		if err != nil {
-			return nil, models.NewInternalError(err)
+			return nil, lib_models.NewInternalError(err)
 		}
 		doc[swaggerSchemesKey] = b
 	}
@@ -175,8 +176,8 @@ func getExtPaths(args [][2]string) (extPaths []string) {
 	return
 }
 
-func newSwaggerItem(sd models.StorageData) models.SwaggerItem {
-	si := models.SwaggerItem{ID: sd.ID}
+func newSwaggerItem(sd models.StorageData) lib_models.SwaggerItem {
+	si := lib_models.SwaggerItem{ID: sd.ID}
 	for _, arg := range sd.Args {
 		switch arg[0] {
 		case extPathArgKey:

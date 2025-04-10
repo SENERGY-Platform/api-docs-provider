@@ -18,24 +18,24 @@ package api
 
 import (
 	"errors"
-	"github.com/SENERGY-Platform/api-docs-provider/pkg/models"
+	lib_models "github.com/SENERGY-Platform/api-docs-provider/lib/models"
 	"net/http"
 )
 
 func GetStatusCode(err error) int {
-	var nfe *models.NotFoundError
+	var nfe *lib_models.NotFoundError
 	if errors.As(err, &nfe) {
 		return http.StatusNotFound
 	}
-	var iie *models.InvalidInputError
+	var iie *lib_models.InvalidInputError
 	if errors.As(err, &iie) {
 		return http.StatusBadRequest
 	}
-	var ie *models.InternalError
+	var ie *lib_models.InternalError
 	if errors.As(err, &ie) {
 		return http.StatusInternalServerError
 	}
-	var rbe *models.ResourceBusyError
+	var rbe *lib_models.ResourceBusyError
 	if errors.As(err, &rbe) {
 		return http.StatusConflict
 	}

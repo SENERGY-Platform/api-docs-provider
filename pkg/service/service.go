@@ -18,7 +18,7 @@ package service
 
 import (
 	"context"
-	"github.com/SENERGY-Platform/api-docs-provider/pkg/models"
+	lib_models "github.com/SENERGY-Platform/api-docs-provider/lib/models"
 	srv_info_hdl "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl"
 )
 
@@ -38,10 +38,10 @@ func New(swaggerSrv swaggerService, asyncapiSrv asyncapiService, srvInfoHdl srv_
 
 func (s *Service) HealthCheck(ctx context.Context) error {
 	if _, err := s.SwaggerListStorage(ctx); err != nil {
-		return models.NewInternalError(err)
+		return lib_models.NewInternalError(err)
 	}
 	if _, err := s.AsyncapiListStorage(ctx); err != nil {
-		return models.NewInternalError(err)
+		return lib_models.NewInternalError(err)
 	}
 	return nil
 }
