@@ -117,7 +117,7 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err := swaggerSrv.SwaggerPeriodicProcurement(ctx, cfg.Procurement.Interval); err != nil {
+		if err := swaggerSrv.SwaggerPeriodicProcurement(ctx, cfg.Procurement.Interval, cfg.Procurement.InitialDelay); err != nil {
 			util.Logger.Error("periodic procurement failed", attributes.ErrorKey, err)
 			ec = 1
 		}

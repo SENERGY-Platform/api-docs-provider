@@ -32,7 +32,7 @@ import (
 	"time"
 )
 
-func (s *Service) SwaggerPeriodicProcurement(ctx context.Context, interval time.Duration) error {
+func (s *Service) SwaggerPeriodicProcurement(ctx context.Context, interval, delay time.Duration) error {
 	logger.Info("starting periodic procurement")
 	var lErr error
 	defer func() {
@@ -42,7 +42,7 @@ func (s *Service) SwaggerPeriodicProcurement(ctx context.Context, interval time.
 		}
 		logger.Info("periodic procurement halted")
 	}()
-	timer := time.NewTimer(time.Microsecond)
+	timer := time.NewTimer(delay)
 	loop := true
 	for loop {
 		select {

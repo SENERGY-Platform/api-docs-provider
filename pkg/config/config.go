@@ -32,6 +32,7 @@ type KongConfig struct {
 type ProcurementConfig struct {
 	SwaggerDocPath string        `json:"swagger_doc_path" env_var:"SWAGGER_DOC_PATH"`
 	Interval       time.Duration `json:"interval" env_var:"PROCUREMENT_INTERVAL"`
+	InitialDelay   time.Duration `json:"initial_delay" env_var:"PROCUREMENT_INITIAL_DELAY"`
 }
 
 type FilterConfig struct {
@@ -75,7 +76,8 @@ func New(path string) (*Config, error) {
 			AsyncapiDataPath: "asyncapi-data",
 		},
 		Procurement: ProcurementConfig{
-			Interval: time.Hour * 6,
+			Interval:     time.Hour * 6,
+			InitialDelay: time.Second * 5,
 		},
 		HttpTimeout: time.Second * 30,
 	}
