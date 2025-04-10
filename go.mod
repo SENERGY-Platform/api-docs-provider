@@ -1,4 +1,4 @@
-module github.com/SENERGY-Platform/swagger-docs-provider
+module github.com/SENERGY-Platform/api-docs-provider
 
 go 1.24.1
 

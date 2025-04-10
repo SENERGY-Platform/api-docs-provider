@@ -19,10 +19,10 @@ package api
 import (
 	"context"
 	"errors"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/models"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/util"
 	"github.com/SENERGY-Platform/go-service-base/struct-logger/attributes"
 	_ "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl/lib"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 	"io"

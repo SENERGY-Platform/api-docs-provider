@@ -17,18 +17,18 @@
 package api
 
 import (
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/util"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/util/slog_attr"
 	gin_mw "github.com/SENERGY-Platform/gin-middleware"
 	"github.com/SENERGY-Platform/go-service-base/struct-logger/attributes"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util/slog_attr"
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 )
 
 // New godoc
-// @title Swagger-Docs-Provider API
+// @title Api-Docs-Provider API
 // @version 0.5.5
-// @description Provides swagger docs and storage management.
+// @description Provides api docs and storage management.
 // @license.name Apache-2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @BasePath /

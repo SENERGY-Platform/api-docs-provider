@@ -19,9 +19,9 @@ package discovery_hdl
 import (
 	"context"
 	"fmt"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/kong_clt"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util/slog_attr"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/components/kong_clt"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/models"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/util/slog_attr"
 	"time"
 )
 

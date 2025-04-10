@@ -18,9 +18,9 @@ package storage_hdl
 
 import (
 	"context"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/models"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/util"
 	"github.com/SENERGY-Platform/go-service-base/struct-logger"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
 	"os"
 	"reflect"
 	"testing"

@@ -19,21 +19,21 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/api"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/components/discovery_hdl"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/components/doc_clt"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/components/kong_clt"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/components/ladon_clt"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/components/storage_hdl"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/config"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/service"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/service/asyncapi_srv"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/service/swagger_srv"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/util"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/util/slog_attr"
 	"github.com/SENERGY-Platform/go-service-base/struct-logger/attributes"
 	srv_info_hdl "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl"
 	sb_util "github.com/SENERGY-Platform/mgw-go-service-base/util"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/api"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/discovery_hdl"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/doc_clt"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/kong_clt"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/ladon_clt"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/components/storage_hdl"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/config"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/service"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/service/asyncapi_srv"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/service/swagger_srv"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util/slog_attr"
 	"net/http"
 	"os"
 	"sync"
@@ -43,7 +43,7 @@ import (
 var version string
 
 func main() {
-	srvInfoHdl := srv_info_hdl.New("swagger-docs-provider", version)
+	srvInfoHdl := srv_info_hdl.New("api-docs-provider", version)
 
 	ec := 0
 	defer func() {

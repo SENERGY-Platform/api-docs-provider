@@ -16,7 +16,7 @@
 
 package storage_hdl
 
-import "github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
+import "github.com/SENERGY-Platform/api-docs-provider/pkg/models"
 
 type storageItem struct {
 	models.StorageData

@@ -18,7 +18,7 @@ package util
 
 import (
 	"context"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/models"
 )
 
 func GetReqID(ctx context.Context) string {

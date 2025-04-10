@@ -19,7 +19,7 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/models"
 )
 
 type swaggerService interface {

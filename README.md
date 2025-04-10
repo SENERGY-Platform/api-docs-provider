@@ -1,4 +1,4 @@
-swagger-docs-provider
+api-docs-provider
 =======
 
 Generate swagger docs:

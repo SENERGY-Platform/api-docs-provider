@@ -20,11 +20,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/models"
+	srv_util "github.com/SENERGY-Platform/api-docs-provider/pkg/service/util"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/util"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/util/slog_attr"
 	"github.com/SENERGY-Platform/go-service-base/struct-logger/attributes"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
-	srv_util "github.com/SENERGY-Platform/swagger-docs-provider/pkg/service/util"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util/slog_attr"
 	"sync"
 )
 

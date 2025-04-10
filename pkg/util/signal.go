@@ -18,7 +18,7 @@ package util
 
 import (
 	"context"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/util/slog_attr"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/util/slog_attr"
 	"os"
 	"os/signal"
 )

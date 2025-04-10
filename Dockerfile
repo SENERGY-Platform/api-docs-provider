@@ -9,8 +9,8 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o bin -ldflags="-X 'main.version=$VERSION
 
 FROM alpine:3.20
 
-RUN mkdir -p /opt/swagger-docs-provider
-WORKDIR /opt/swagger-docs-provider
+RUN mkdir -p /opt/api-docs-provider
+WORKDIR /opt/api-docs-provider
 COPY --from=builder /go/src/app/bin bin
 COPY --from=builder /go/src/app/docs docs
 

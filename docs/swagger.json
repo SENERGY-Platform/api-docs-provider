@@ -1,8 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "Provides swagger docs and storage management.",
-        "title": "Swagger-Docs-Provider API",
+        "description": "Provides api docs and storage management.",
+        "title": "Api-Docs-Provider API",
         "contact": {},
         "license": {
             "name": "Apache-2.0",

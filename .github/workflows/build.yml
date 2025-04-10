@@ -32,5 +32,5 @@ jobs:
           build-args: |
             VERSION=${{ github.ref_name }}
           tags: |
-            ghcr.io/senergy-platform/swagger-docs-provider:latest
-            ghcr.io/senergy-platform/swagger-docs-provider:${{ github.ref_name }}
+            ghcr.io/senergy-platform/api-docs-provider:latest
+            ghcr.io/senergy-platform/api-docs-provider:${{ github.ref_name }}

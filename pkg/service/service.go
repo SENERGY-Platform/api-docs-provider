@@ -18,8 +18,8 @@ package service
 
 import (
 	"context"
+	"github.com/SENERGY-Platform/api-docs-provider/pkg/models"
 	srv_info_hdl "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl"
-	"github.com/SENERGY-Platform/swagger-docs-provider/pkg/models"
 )
 
 type Service struct {
