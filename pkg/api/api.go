@@ -17,6 +17,7 @@
 package api
 
 import (
+	lib_models "github.com/SENERGY-Platform/api-docs-provider/lib/models"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/util"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/util/slog_attr"
 	gin_mw "github.com/SENERGY-Platform/gin-middleware"
@@ -50,7 +51,7 @@ func New(srv Service, staticHeader map[string]string, accessLog bool) (*gin.Engi
 	}
 	middleware = append(middleware,
 		gin_mw.StaticHeaderHandler(staticHeader),
-		requestid.New(requestid.WithCustomHeaderStrKey(HeaderRequestID)),
+		requestid.New(requestid.WithCustomHeaderStrKey(lib_models.HeaderRequestID)),
 		gin_mw.ErrorHandler(GetStatusCode, ", "),
 		gin_mw.StructRecoveryHandler(util.Logger, gin_mw.DefaultRecoveryFunc),
 	)

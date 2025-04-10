@@ -19,6 +19,7 @@ package main
 import (
 	"context"
 	"fmt"
+	lib_models "github.com/SENERGY-Platform/api-docs-provider/lib/models"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/api"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/components/discovery_hdl"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/components/doc_clt"
@@ -81,8 +82,8 @@ func main() {
 	srv := service.New(swaggerSrv, asyncapiSrv, srvInfoHdl)
 
 	httpHandler, err := api.New(srv, map[string]string{
-		api.HeaderApiVer:  srvInfoHdl.GetVersion(),
-		api.HeaderSrvName: srvInfoHdl.GetName(),
+		lib_models.HeaderApiVer:  srvInfoHdl.GetVersion(),
+		lib_models.HeaderSrvName: srvInfoHdl.GetName(),
 	}, cfg.HttpAccessLog)
 	if err != nil {
 		util.Logger.Error("creating http engine failed", attributes.ErrorKey, err)
