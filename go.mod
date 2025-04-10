@@ -3,7 +3,7 @@ module github.com/SENERGY-Platform/api-docs-provider
 go 1.24.1
 
 require (
-	github.com/SENERGY-Platform/api-docs-provider/lib v0.0.0-00010101000000-000000000000
+	github.com/SENERGY-Platform/api-docs-provider/lib/models v0.0.0-00010101000000-000000000000
 	github.com/SENERGY-Platform/gin-middleware v0.9.0
 	github.com/SENERGY-Platform/go-base-http-client v0.1.0
 	github.com/SENERGY-Platform/go-service-base/config-hdl v1.1.0
@@ -45,4 +45,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/SENERGY-Platform/api-docs-provider/lib => ./lib
+replace github.com/SENERGY-Platform/api-docs-provider/lib/models => ./lib/models
