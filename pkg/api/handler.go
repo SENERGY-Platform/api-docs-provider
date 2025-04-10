@@ -31,31 +31,6 @@ import (
 	"strings"
 )
 
-// getSwaggerGetDocsOldH godoc
-// @Summary Get docs (deprecated)
-// @Description Get all swagger docs.
-// @Tags Swagger
-// @Produce	json
-// @Param Authorization header string false "jwt token"
-// @Param X-User-Roles header string false "user roles"
-// @Success	200 {array} object "list of swagger docs"
-// @Failure	500 {string} string "error message"
-// @Router /swagger [get]
-func getSwaggerGetDocsOldH(srv Service) (string, string, gin.HandlerFunc) {
-	return http.MethodGet, "/swagger", func(gc *gin.Context) {
-		var userRoles []string
-		if val := gc.GetHeader(HeaderUserRoles); val != "" {
-			userRoles = strings.Split(val, ", ")
-		}
-		swaggerDocs, err := srv.SwaggerGetDocs(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)), gc.Request.Header.Get(HeaderAuthorization), userRoles)
-		if err != nil {
-			_ = gc.Error(err)
-			return
-		}
-		gc.JSON(http.StatusOK, swaggerDocs)
-	}
-}
-
 // getSwaggerGetDocsH godoc
 // @Summary Get docs
 // @Description Get all swagger docs.
@@ -65,9 +40,9 @@ func getSwaggerGetDocsOldH(srv Service) (string, string, gin.HandlerFunc) {
 // @Param X-User-Roles header string false "user roles"
 // @Success	200 {array} object "list of swagger docs"
 // @Failure	500 {string} string "error message"
-// @Router /swagger/docs [get]
+// @Router /docs/swagger [get]
 func getSwaggerGetDocsH(srv Service) (string, string, gin.HandlerFunc) {
-	return http.MethodGet, "/swagger/docs", func(gc *gin.Context) {
+	return http.MethodGet, "/docs/swagger", func(gc *gin.Context) {
 		var userRoles []string
 		if val := gc.GetHeader(HeaderUserRoles); val != "" {
 			userRoles = strings.Split(val, ", ")
@@ -87,9 +62,9 @@ func getSwaggerGetDocsH(srv Service) (string, string, gin.HandlerFunc) {
 // @Tags Swagger
 // @Success	200
 // @Failure	500 {string} string "error message"
-// @Router /swagger/storage-refresh [patch]
+// @Router /storage-refresh/swagger [patch]
 func patchSwaggerRefreshDocsH(srv Service) (string, string, gin.HandlerFunc) {
-	return http.MethodPatch, "/swagger/storage-refresh", func(gc *gin.Context) {
+	return http.MethodPatch, "/storage-refresh/swagger", func(gc *gin.Context) {
 		err := srv.SwaggerRefreshDocs(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)))
 		if err != nil {
 			_ = gc.Error(err)
@@ -106,9 +81,9 @@ func patchSwaggerRefreshDocsH(srv Service) (string, string, gin.HandlerFunc) {
 // @Produce	json
 // @Success	200 {array} models.SwaggerItem "stored items"
 // @Failure	500 {string} string "error message"
-// @Router /swagger/storage [get]
+// @Router /storage/swagger [get]
 func getSwaggerListStorageH(srv Service) (string, string, gin.HandlerFunc) {
-	return http.MethodGet, "/swagger/storage", func(gc *gin.Context) {
+	return http.MethodGet, "/storage/swagger", func(gc *gin.Context) {
 		items, err := srv.SwaggerListStorage(gc.Request.Context())
 		if err != nil {
 			_ = gc.Error(err)
@@ -126,9 +101,9 @@ func getSwaggerListStorageH(srv Service) (string, string, gin.HandlerFunc) {
 // @Param Authorization header string false "jwt token"
 // @Success	200 {array} object "list of asyncapi docs"
 // @Failure	500 {string} string "error message"
-// @Router /asyncapi/docs [get]
+// @Router /docs/asyncapi [get]
 func getAsyncapiGetDocsH(srv Service) (string, string, gin.HandlerFunc) {
-	return http.MethodGet, "/asyncapi/docs", func(gc *gin.Context) {
+	return http.MethodGet, "/docs/asyncapi", func(gc *gin.Context) {
 		docs, err := srv.AsyncapiGetDocs(gc.Request.Context())
 		if err != nil {
 			_ = gc.Error(err)
@@ -146,9 +121,9 @@ func getAsyncapiGetDocsH(srv Service) (string, string, gin.HandlerFunc) {
 // @Param Authorization header string false "jwt token"
 // @Success	200 {array} models.AsyncapiItem "stored items"
 // @Failure	500 {string} string "error message"
-// @Router /asyncapi/storage [get]
+// @Router /storage/asyncapi [get]
 func getAsyncapiListStorage(srv Service) (string, string, gin.HandlerFunc) {
-	return http.MethodGet, "/asyncapi/storage", func(gc *gin.Context) {
+	return http.MethodGet, "/storage/asyncapi", func(gc *gin.Context) {
 		items, err := srv.AsyncapiListStorage(gc.Request.Context())
 		if err != nil {
 			_ = gc.Error(err)
@@ -169,9 +144,9 @@ func getAsyncapiListStorage(srv Service) (string, string, gin.HandlerFunc) {
 // @Success	200
 // @Failure	400 {string} string "error message"
 // @Failure	500 {string} string "error message"
-// @Router /asyncapi/storage/{id} [put]
+// @Router /storage/asyncapi/{id} [put]
 func putAsyncapiPutDocH(srv Service) (string, string, gin.HandlerFunc) {
-	return http.MethodPut, "/asyncapi/storage/:id", func(gc *gin.Context) {
+	return http.MethodPut, "/storage/asyncapi/:id", func(gc *gin.Context) {
 		id := gc.Param("id")
 		if id == "" {
 			_ = gc.Error(models.NewInvalidInputError(errors.New("id is required")))
@@ -201,9 +176,9 @@ func putAsyncapiPutDocH(srv Service) (string, string, gin.HandlerFunc) {
 // @Failure	400 {string} string "error message"
 // @Failure	404 {string} string "error message"
 // @Failure	500 {string} string "error message"
-// @Router /asyncapi/storage/{id} [delete]
+// @Router /storage/asyncapi/{id} [delete]
 func deleteAsyncapiDeleteDocH(srv Service) (string, string, gin.HandlerFunc) {
-	return http.MethodDelete, "/asyncapi/storage/:id", func(gc *gin.Context) {
+	return http.MethodDelete, "/storage/asyncapi/:id", func(gc *gin.Context) {
 		id := gc.Param("id")
 		if id == "" {
 			_ = gc.Error(models.NewInvalidInputError(errors.New("id is required")))
