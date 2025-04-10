@@ -31,6 +31,5 @@ type Service interface {
 	AsyncapiPutDoc(ctx context.Context, id string, data []byte) error
 	AsyncapiDeleteDoc(ctx context.Context, id string) error
 	AsyncapiListStorage(ctx context.Context) ([]models.AsyncapiItem, error)
-	HealthCheck(ctx context.Context) error
 	srv_info_hdl.SrvInfoHandler
 }
