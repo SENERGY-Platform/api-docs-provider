@@ -27,8 +27,8 @@ import (
 )
 
 // New godoc
-// @title Api-Docs-Provider API
-// @version 0.6.0
+// @title Api-Docs-Provider
+// @version 0.7.3
 // @description Provides api docs and storage management.
 // @license.name Apache-2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html

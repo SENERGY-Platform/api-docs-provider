@@ -2,13 +2,13 @@
     "swagger": "2.0",
     "info": {
         "description": "Provides api docs and storage management.",
-        "title": "Api-Docs-Provider API",
+        "title": "Api-Docs-Provider",
         "contact": {},
         "license": {
             "name": "Apache-2.0",
             "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
         },
-        "version": "0.6.0"
+        "version": "0.7.3"
     },
     "basePath": "/",
     "paths": {
@@ -290,6 +290,49 @@
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/models.SwaggerItem"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/swagger": {
+            "get": {
+                "description": "Get all swagger docs.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Swagger"
+                ],
+                "summary": "Get docs (deprecated)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "user roles",
+                        "name": "X-User-Roles",
+                        "in": "header"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "list of swagger docs",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object"
                             }
                         }
                     },
