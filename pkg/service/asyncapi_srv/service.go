@@ -121,6 +121,8 @@ func newAsyncapiItem(sd models.StorageData) lib_models.AsyncapiItem {
 			ai.Title = arg[1]
 		case versionArgKey:
 			ai.Version = arg[1]
+		case descriptionArgKey:
+			ai.Description = arg[1]
 		}
 	}
 	return ai

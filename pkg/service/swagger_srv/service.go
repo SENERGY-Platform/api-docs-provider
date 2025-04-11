@@ -187,6 +187,8 @@ func newSwaggerItem(sd models.StorageData) lib_models.SwaggerItem {
 			si.Title = arg[1]
 		case versionArgKey:
 			si.Version = arg[1]
+		case descriptionArgKey:
+			si.Description = arg[1]
 		}
 	}
 	return si
