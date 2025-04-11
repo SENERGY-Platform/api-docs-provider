@@ -33,7 +33,7 @@ import (
 )
 
 // getSwaggerGetDocsOldH godoc
-// @Summary Get docs (deprecated)
+// @Summary Get docs
 // @Description Get all swagger docs.
 // @Tags Swagger
 // @Produce	json
@@ -42,6 +42,7 @@ import (
 // @Success	200 {array} object "list of swagger docs"
 // @Failure	500 {string} string "error message"
 // @Router /swagger [get]
+// @Deprecated
 func getSwaggerGetDocsOldH(srv Service) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, "/swagger", func(gc *gin.Context) {
 		var userRoles []string

@@ -311,7 +311,8 @@
                 "tags": [
                     "Swagger"
                 ],
-                "summary": "Get docs (deprecated)",
+                "summary": "Get docs",
+                "deprecated": true,
                 "parameters": [
                     {
                         "type": "string",
@@ -421,17 +422,13 @@
                 1,
                 1000,
                 1000000,
-                1000000000,
-                60000000000,
-                3600000000000
+                1000000000
             ],
             "x-enum-varnames": [
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
-                "Second",
-                "Minute",
-                "Hour"
+                "Second"
             ]
         }
     }
