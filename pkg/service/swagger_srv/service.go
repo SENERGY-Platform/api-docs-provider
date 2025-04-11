@@ -33,9 +33,10 @@ import (
 )
 
 const (
-	extPathArgKey = "ext-path"
-	titleArgKey   = "title"
-	versionArgKey = "version"
+	extPathArgKey     = "ext-path"
+	titleArgKey       = "title"
+	versionArgKey     = "version"
+	descriptionArgKey = "description"
 )
 
 type Service struct {

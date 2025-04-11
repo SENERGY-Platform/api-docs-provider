@@ -30,8 +30,9 @@ import (
 )
 
 const (
-	titleArgKey   = "title"
-	versionArgKey = "version"
+	titleArgKey       = "title"
+	versionArgKey     = "version"
+	descriptionArgKey = "description"
 )
 
 type Service struct {
@@ -84,14 +85,15 @@ func (s *Service) AsyncapiPutDoc(ctx context.Context, id string, data []byte) er
 		logger.Error("validating doc failed", slog_attr.IDKey, id, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
 		return lib_models.NewInvalidInputError(err)
 	}
-	title, version, err := getAsyncapiInfo(data)
+	aInfo, err := getAsyncapiInfo(data)
 	if err != nil {
 		logger.Error("extracting info failed", slog_attr.IDKey, id, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
 		return lib_models.NewInternalError(err)
 	}
 	return s.storageHdl.Write(ctx, id, [][2]string{
-		{titleArgKey, title},
-		{versionArgKey, version},
+		{titleArgKey, aInfo.Title},
+		{versionArgKey, aInfo.Version},
+		{descriptionArgKey, aInfo.Description},
 	}, data)
 }
 
@@ -135,10 +137,10 @@ func validateDoc(doc []byte) error {
 	return nil
 }
 
-func getAsyncapiInfo(doc []byte) (string, string, error) {
-	var info asyncapiInfo
-	if err := json.Unmarshal(doc, &info); err != nil {
-		return "", "", err
+func getAsyncapiInfo(doc []byte) (asyncapiInfo, error) {
+	var aDoc asyncapiDoc
+	if err := json.Unmarshal(doc, &aDoc); err != nil {
+		return asyncapiInfo{}, err
 	}
-	return info.Info.Title, info.Info.Version, nil
+	return aDoc.Info, nil
 }

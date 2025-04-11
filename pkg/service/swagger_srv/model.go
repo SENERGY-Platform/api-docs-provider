@@ -48,9 +48,12 @@ type docWrapper struct {
 	doc      map[string]json.RawMessage
 }
 
+type swaggerDoc struct {
+	Info swaggerInfo `json:"info"`
+}
+
 type swaggerInfo struct {
-	Info struct {
-		Title   string `json:"title"`
-		Version string `json:"version"`
-	} `json:"info"`
+	Title       string `json:"title"`
+	Version     string `json:"version"`
+	Description string `json:"description"`
 }

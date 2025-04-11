@@ -118,6 +118,7 @@ func TestHandler_RefreshStorage(t *testing.T) {
 				Args: [][2]string{
 					{titleArgKey, "Test"},
 					{versionArgKey, "v1"},
+					{descriptionArgKey, "Test Swagger"},
 					{extPathArgKey, "/t"},
 				},
 			},
@@ -129,6 +130,7 @@ func TestHandler_RefreshStorage(t *testing.T) {
 				Args: [][2]string{
 					{titleArgKey, "Test"},
 					{versionArgKey, "v1"},
+					{descriptionArgKey, "Test Swagger"},
 					{extPathArgKey, "/t"},
 				},
 			},

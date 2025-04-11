@@ -126,14 +126,15 @@ func (s *Service) handleService(ctx context.Context, wg *sync.WaitGroup, service
 		logger.Warn("validating doc failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
 		return
 	}
-	title, version, err := getSwaggerInfo(doc)
+	sInfo, err := getSwaggerInfo(doc)
 	if err != nil {
 		logger.Warn("extracting info failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
 		return
 	}
 	args := [][2]string{
-		{titleArgKey, title},
-		{versionArgKey, version},
+		{titleArgKey, sInfo.Title},
+		{versionArgKey, sInfo.Version},
+		{descriptionArgKey, sInfo.Description},
 	}
 	for _, path := range service.ExtPaths {
 		args = append(args, [2]string{extPathArgKey, path})
@@ -155,10 +156,10 @@ func validateDoc(doc []byte) error {
 	return nil
 }
 
-func getSwaggerInfo(doc []byte) (string, string, error) {
-	var info swaggerInfo
-	if err := json.Unmarshal(doc, &info); err != nil {
-		return "", "", err
+func getSwaggerInfo(doc []byte) (swaggerInfo, error) {
+	var sDoc swaggerDoc
+	if err := json.Unmarshal(doc, &sDoc); err != nil {
+		return swaggerInfo{}, err
 	}
-	return info.Info.Title, info.Info.Version, nil
+	return sDoc.Info, nil
 }

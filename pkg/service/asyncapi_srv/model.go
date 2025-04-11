@@ -33,9 +33,12 @@ var asyncapiV3Keys = []string{
 	asyncapiInfoKey,
 }
 
+type asyncapiDoc struct {
+	Info asyncapiInfo `json:"info"`
+}
+
 type asyncapiInfo struct {
-	Info struct {
-		Title   string `json:"title"`
-		Version string `json:"version"`
-	} `json:"info"`
+	Title       string `json:"title"`
+	Version     string `json:"version"`
+	Description string `json:"description"`
 }
