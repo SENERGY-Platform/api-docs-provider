@@ -7,14 +7,16 @@ const (
 )
 
 type SwaggerItem struct {
-	ID       string   `json:"id"`
-	Title    string   `json:"title"`
-	Version  string   `json:"version"`
-	ExtPaths []string `json:"ext_paths"`
+	ID          string   `json:"id"`
+	Title       string   `json:"title"`
+	Version     string   `json:"version"`
+	ExtPaths    []string `json:"ext_paths"`
+	Description string   `json:"description"`
 }
 
 type AsyncapiItem struct {
-	ID      string `json:"id"`
-	Title   string `json:"title"`
-	Version string `json:"version"`
+	ID          string `json:"id"`
+	Title       string `json:"title"`
+	Version     string `json:"version"`
+	Description string `json:"description"`
 }
