@@ -79,6 +79,17 @@ func (s *Service) AsyncapiGetDocs(ctx context.Context) ([]json.RawMessage, error
 	return docs, nil
 }
 
+func (s *Service) AsyncapiGetDoc(ctx context.Context, id string) ([]byte, error) {
+	reqID := util.GetReqID(ctx)
+	logger.Debug("reading doc", slog_attr.IDKey, id, slog_attr.RequestIDKey, reqID)
+	rawDoc, err := s.storageHdl.Read(ctx, id)
+	if err != nil {
+		logger.Error("reading doc failed", slog_attr.IDKey, id, attributes.ErrorKey, err.Error(), slog_attr.RequestIDKey, reqID)
+		return nil, err
+	}
+	return rawDoc, nil
+}
+
 func (s *Service) AsyncapiPutDoc(ctx context.Context, id string, data []byte) error {
 	reqID := util.GetReqID(ctx)
 	if err := validateDoc(data); err != nil {

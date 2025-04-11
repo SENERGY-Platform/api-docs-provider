@@ -26,6 +26,7 @@ var routes = gin_mw.Routes[Service]{
 	patchSwaggerRefreshDocsH,
 	getSwaggerListStorageH,
 	getAsyncapiGetDocsH,
+	getAsyncapiGetDocH,
 	getAsyncapiListStorage,
 	putAsyncapiPutDocH,
 	deleteAsyncapiDeleteDocH,

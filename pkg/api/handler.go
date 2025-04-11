@@ -140,6 +140,27 @@ func getAsyncapiGetDocsH(srv Service) (string, string, gin.HandlerFunc) {
 	}
 }
 
+// getAsyncapiGetDocH godoc
+// @Summary Get doc
+// @Description Get an asyncapi doc.
+// @Tags AsyncAPI
+// @Produce	json
+// @Param Authorization header string false "jwt token"
+// @Param id path string true "doc id"
+// @Success	200 {object} object "asyncapi doc"
+// @Failure	500 {string} string "error message"
+// @Router /docs/asyncapi/{id} [get]
+func getAsyncapiGetDocH(srv Service) (string, string, gin.HandlerFunc) {
+	return http.MethodGet, "/docs/asyncapi/:id", func(gc *gin.Context) {
+		doc, err := srv.AsyncapiGetDoc(gc.Request.Context(), gc.Param("id"))
+		if err != nil {
+			_ = gc.Error(err)
+			return
+		}
+		gc.Data(http.StatusOK, gin.MIMEJSON, doc)
+	}
+}
+
 // getAsyncapiListStorage godoc
 // @Summary List storage
 // @Description Get meta information of all stored items.
@@ -206,12 +227,7 @@ func putAsyncapiPutDocH(srv Service) (string, string, gin.HandlerFunc) {
 // @Router /storage/asyncapi/{id} [delete]
 func deleteAsyncapiDeleteDocH(srv Service) (string, string, gin.HandlerFunc) {
 	return http.MethodDelete, "/storage/asyncapi/:id", func(gc *gin.Context) {
-		id := gc.Param("id")
-		if id == "" {
-			_ = gc.Error(lib_models.NewInvalidInputError(errors.New("id is required")))
-			return
-		}
-		err := srv.AsyncapiDeleteDoc(gc.Request.Context(), id)
+		err := srv.AsyncapiDeleteDoc(gc.Request.Context(), gc.Param("id"))
 		if err != nil {
 			_ = gc.Error(err)
 			return

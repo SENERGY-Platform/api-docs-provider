@@ -28,6 +28,7 @@ type Service interface {
 	SwaggerListStorage(ctx context.Context) ([]lib_models.SwaggerItem, error)
 	SwaggerRefreshDocs(ctx context.Context) error
 	AsyncapiGetDocs(ctx context.Context) ([]json.RawMessage, error)
+	AsyncapiGetDoc(ctx context.Context, id string) ([]byte, error)
 	AsyncapiPutDoc(ctx context.Context, id string, data []byte) error
 	AsyncapiDeleteDoc(ctx context.Context, id string) error
 	AsyncapiListStorage(ctx context.Context) ([]lib_models.AsyncapiItem, error)
