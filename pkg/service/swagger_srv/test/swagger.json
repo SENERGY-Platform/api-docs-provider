@@ -10,7 +10,7 @@
     },
     "version": "v1"
   },
-  "basePath": "/",
+  "basePath": "/t",
   "paths": {
     "/a": {
       "get": {

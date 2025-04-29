@@ -37,7 +37,7 @@ func TestHandler_filterDoc(t *testing.T) {
 	srv := New(nil, nil, nil, ladonClt, 0, "", "")
 	t.Run("include", func(t *testing.T) {
 		ladonClt.TokenPolicies = map[string][]string{
-			"/a": {"get"},
+			"/t/a": {"get"},
 		}
 		ok, err := srv.filterDoc(context.Background(), doc, "test", nil)
 		if err != nil {
