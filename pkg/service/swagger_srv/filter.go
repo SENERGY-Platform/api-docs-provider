@@ -75,7 +75,8 @@ func (s *Service) getNewPathsByToken(ctx context.Context, oldPaths map[string]ma
 	ctxWt, cf := context.WithTimeout(ctx, s.timeout)
 	defer cf()
 	accessPolicies, err := s.ladonClt.GetUserAccessPolicy(ctxWt, userToken, getPathMethodsMap(oldPaths, basePath))
-	fmt.Println(json.Marshal(accessPolicies))
+	b, _ := json.Marshal(accessPolicies)
+	fmt.Println(string(b))
 	if err != nil {
 		return nil, nil, err
 	}
