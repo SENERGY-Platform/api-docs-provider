@@ -19,14 +19,19 @@ package swagger_srv
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"path"
 	"regexp"
 )
 
 var regRegex = regexp.MustCompile(`\"\$ref\": ?\"#\/definitions\/(.+)\"`)
 
-func (s *Service) filterDoc(ctx context.Context, doc map[string]json.RawMessage, userToken string, userRoles []string, basePath string) (bool, error) {
-	oldPaths, err := getDocPaths(doc)
+func (s *Service) filterDoc(ctx context.Context, doc map[string]json.RawMessage, userToken string, userRoles []string) (bool, error) {
+	basePath, err := getBasePath(doc)
+	if err != nil {
+		return false, err
+	}
+	oldPaths, err := getSwaggerPaths(doc)
 	if err != nil {
 		return false, err
 	}
@@ -128,7 +133,7 @@ func (s *Service) getAccessPolicyByRole(ctx context.Context, fullPath, role, met
 	return s.ladonClt.GetRoleAccessPolicy(ctxWt, role, fullPath, method)
 }
 
-func getDocPaths(doc map[string]json.RawMessage) (map[string]map[string]json.RawMessage, error) {
+func getSwaggerPaths(doc map[string]json.RawMessage) (map[string]map[string]json.RawMessage, error) {
 	rawPaths, ok := doc[swaggerPathsKey]
 	if !ok {
 		return nil, nil
@@ -206,4 +211,16 @@ func getPathMethodsMap(oldPaths map[string]map[string]json.RawMessage, basePath 
 		}
 	}
 	return pathMethodsMap
+}
+
+func getBasePath(doc map[string]json.RawMessage) (string, error) {
+	raw, ok := doc[swaggerBasePathKey]
+	if !ok {
+		return "", errors.New("missing key")
+	}
+	var basePath string
+	if err := json.Unmarshal(raw, &basePath); err != nil {
+		return "", err
+	}
+	return basePath, nil
 }

@@ -27,7 +27,10 @@ import (
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/util"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/util/slog_attr"
 	"github.com/SENERGY-Platform/go-service-base/struct-logger/attributes"
+	"path"
 	"runtime/debug"
+	"slices"
+	"strings"
 	"sync"
 	"time"
 )
@@ -101,8 +104,14 @@ func (s *Service) cleanOldServices(ctx context.Context, services map[string]mode
 	if err != nil {
 		return err
 	}
+	servicesSet := make(map[string]struct{})
+	for _, service := range services {
+		for _, extPath := range service.ExtPaths {
+			servicesSet[getStorageID(service.ID, extPath)] = struct{}{}
+		}
+	}
 	for _, service := range storedServices {
-		if _, ok := services[service.ID]; !ok {
+		if _, ok := servicesSet[service.ID]; !ok {
 			if err = s.storageHdl.Delete(ctx, service.ID); err != nil {
 				logger.Error("removing old doc failed", attributes.ErrorKey, err, slog_attr.RequestIDKey, util.GetReqID(ctx))
 			}
@@ -122,44 +131,110 @@ func (s *Service) handleService(ctx context.Context, wg *sync.WaitGroup, service
 		logger.Debug("probing host failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
 		return
 	}
-	if err = validateDoc(doc); err != nil {
-		logger.Warn("validating doc failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
+	var tmp map[string]json.RawMessage
+	if err := json.Unmarshal(doc, &tmp); err != nil {
+		logger.Error("unmarshalling doc failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
 		return
 	}
-	sInfo, err := getSwaggerInfo(doc)
+	if err = validateSwaggerKeys(tmp); err != nil {
+		logger.Error("validating keys failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
+		return
+	}
+	sInfo, err := getSwaggerInfo(tmp)
 	if err != nil {
-		logger.Warn("extracting info failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
+		logger.Error("extracting info failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
 		return
 	}
-	args := [][2]string{
-		{titleArgKey, sInfo.Title},
-		{versionArgKey, sInfo.Version},
-		{descriptionArgKey, sInfo.Description},
-	}
-	for _, path := range service.ExtPaths {
-		args = append(args, [2]string{extPathArgKey, path})
-	}
-	if err = s.storageHdl.Write(ctx, service.ID, args, doc); err != nil {
-		logger.Error("writing doc failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
+	sPaths, err := getSwaggerPaths(tmp)
+	if err != nil {
+		logger.Error("extracting paths failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
 		return
+	}
+	if err = s.setSwaggerHostAndSchemes(tmp); err != nil {
+		logger.Error("setting swagger host and schemes failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
+		return
+	}
+	for _, extPath := range service.ExtPaths {
+		if err = s.setSwaggerBasePath(tmp, extPath); err != nil {
+			logger.Error("setting swagger base path failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, slog_attr.BasePathKey, extPath, attributes.ErrorKey, err.Error(), slog_attr.RequestIDKey, reqID)
+			continue
+		}
+		b, err := json.Marshal(tmp)
+		if err != nil {
+			logger.Error("marshaling doc failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, slog_attr.BasePathKey, extPath, attributes.ErrorKey, err.Error(), slog_attr.RequestIDKey, reqID)
+			continue
+		}
+		args := [][2]string{
+			{titleArgKey, sInfo.Title},
+			{versionArgKey, sInfo.Version},
+			{descriptionArgKey, sInfo.Description},
+			{basePathArgKey, extPath},
+		}
+		for _, route := range newRoutes(sPaths, extPath) {
+			args = append(args, [2]string{routeArgKey, route})
+		}
+		if err = s.storageHdl.Write(ctx, getStorageID(service.ID, extPath), args, b); err != nil {
+			logger.Error("writing doc failed", slog_attr.HostKey, service.Host, slog_attr.PortKey, service.Port, slog_attr.BasePathKey, extPath, attributes.ErrorKey, err, slog_attr.RequestIDKey, reqID)
+			continue
+		}
 	}
 }
 
-func validateDoc(doc []byte) error {
-	var tmp map[string]json.RawMessage
-	if err := json.Unmarshal(doc, &tmp); err != nil {
-		return err
-	}
+func validateSwaggerKeys(tmp map[string]json.RawMessage) error {
 	if !srv_util.CheckForKeys(tmp, swaggerV2Keys) && !srv_util.CheckForKeys(tmp, swaggerV3Keys) {
 		return errors.New("missing required keys")
 	}
 	return nil
 }
 
-func getSwaggerInfo(doc []byte) (swaggerInfo, error) {
-	var sDoc swaggerDoc
-	if err := json.Unmarshal(doc, &sDoc); err != nil {
+func getSwaggerInfo(tmp map[string]json.RawMessage) (swaggerInfo, error) {
+	raw, ok := tmp[swaggerInfoKey]
+	if !ok {
+		return swaggerInfo{}, errors.New("missing key")
+	}
+	var info swaggerInfo
+	if err := json.Unmarshal(raw, &info); err != nil {
 		return swaggerInfo{}, err
 	}
-	return sDoc.Info, nil
+	return info, nil
+}
+
+func (s *Service) setSwaggerHostAndSchemes(tmp map[string]json.RawMessage) error {
+	b, err := json.Marshal(s.apiGtwHost)
+	if err != nil {
+		return err
+	}
+	tmp[swaggerHostKey] = b
+	if _, ok := tmp[swaggerSchemesKey]; !ok {
+		b, err = json.Marshal([]string{"https"})
+		if err != nil {
+			return err
+		}
+		tmp[swaggerSchemesKey] = b
+	}
+	return nil
+}
+
+func (s *Service) setSwaggerBasePath(tmp map[string]json.RawMessage, basePath string) error {
+	b, err := json.Marshal(basePath)
+	if err != nil {
+		return err
+	}
+	tmp[swaggerBasePathKey] = b
+	return nil
+}
+
+func newRoutes(pathsMap map[string]map[string]json.RawMessage, basePath string) []string {
+	var routes []string
+	for pth, obj := range pathsMap {
+		for mth := range obj {
+			routes = append(routes, fmt.Sprintf("%s%s%s", path.Join(basePath, pth), routeDelimiter, mth))
+		}
+	}
+	slices.Sort(routes)
+	return routes
+}
+
+func getStorageID(srvID, extPath string) string {
+	return srvID + strings.Replace(extPath, "/", "_", -1)
 }
