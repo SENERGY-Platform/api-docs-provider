@@ -23,6 +23,7 @@ import (
 var routes = gin_mw.Routes[Service]{
 	getSwaggerGetDocsOldH,
 	getSwaggerGetDocsH,
+	getSwaggerGetDocH,
 	patchSwaggerRefreshDocsH,
 	getSwaggerListStorageH,
 	getAsyncapiGetDocsH,

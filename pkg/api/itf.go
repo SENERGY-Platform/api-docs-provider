@@ -25,7 +25,8 @@ import (
 
 type Service interface {
 	SwaggerGetDocs(ctx context.Context, userToken string, userRoles []string) ([]map[string]json.RawMessage, error)
-	SwaggerListStorage(ctx context.Context) ([]lib_models.SwaggerItem, error)
+	SwaggerGetDoc(ctx context.Context, id, userToken string, userRoles []string) ([]byte, error)
+	SwaggerListStorage(ctx context.Context, userToken string, userRoles []string) ([]lib_models.SwaggerItem, error)
 	SwaggerRefreshDocs(ctx context.Context) error
 	AsyncapiGetDocs(ctx context.Context) ([]json.RawMessage, error)
 	AsyncapiGetDoc(ctx context.Context, id string) ([]byte, error)

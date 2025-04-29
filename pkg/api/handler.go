@@ -83,6 +83,34 @@ func getSwaggerGetDocsH(srv Service) (string, string, gin.HandlerFunc) {
 	}
 }
 
+// getSwaggerGetDocH godoc
+// @Summary Get doc
+// @Description Get a swagger doc.
+// @Tags Swagger
+// @Produce	json
+// @Param Authorization header string false "jwt token"
+// @Param X-User-Roles header string false "user roles"
+// @Param id path string true "doc id"
+// @Success	200 {object} object "swagger doc"
+// @Failure	403 {string} string "error message"
+// @Failure	404 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /docs/swagger/{id} [get]
+func getSwaggerGetDocH(srv Service) (string, string, gin.HandlerFunc) {
+	return http.MethodGet, "/docs/swagger/:id", func(gc *gin.Context) {
+		var userRoles []string
+		if val := gc.GetHeader(HeaderUserRoles); val != "" {
+			userRoles = strings.Split(val, ", ")
+		}
+		docs, err := srv.SwaggerGetDoc(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)), gc.Param("id"), gc.Request.Header.Get(HeaderAuthorization), userRoles)
+		if err != nil {
+			_ = gc.Error(err)
+			return
+		}
+		gc.JSON(http.StatusOK, docs)
+	}
+}
+
 // patchSwaggerRefreshDocsH godoc
 // @Summary Refresh storage
 // @Description Trigger swagger docs refresh.
