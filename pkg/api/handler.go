@@ -283,18 +283,8 @@ func getInfoH(srv Service) (string, string, gin.HandlerFunc) {
 	}
 }
 
-func getHealthCheckH(srv Service) (string, string, gin.HandlerFunc) {
+func getHealthCheckH(_ Service) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, HealthCheckPath, func(gc *gin.Context) {
-		_, err := srv.SwaggerListStorage(gc.Request.Context())
-		if err != nil {
-			_ = gc.Error(err)
-			return
-		}
-		_, err = srv.AsyncapiListStorage(gc.Request.Context())
-		if err != nil {
-			_ = gc.Error(err)
-			return
-		}
 		gc.Status(http.StatusOK)
 	}
 }
