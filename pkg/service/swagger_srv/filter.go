@@ -20,7 +20,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"path"
 	"regexp"
 )
@@ -196,7 +195,6 @@ func getDefinitionRefs(raw []byte, refs map[string]struct{}) {
 	res := regRegex.FindAllSubmatch(raw, -1)
 	for _, re := range res {
 		if len(re) > 1 {
-			fmt.Println(string(re[0]), " | ", string(re[1]))
 			refs[string(re[1])] = struct{}{}
 		}
 	}
