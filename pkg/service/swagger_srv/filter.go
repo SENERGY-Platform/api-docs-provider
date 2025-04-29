@@ -25,7 +25,7 @@ import (
 	"regexp"
 )
 
-var regRegex = regexp.MustCompile(`\"\$ref\": ?\"#\/definitions\/(.+)\"`)
+var regRegex = regexp.MustCompile(`\"\$ref\": ?\"#\/definitions\/([^\"]+)\"`)
 
 func (s *Service) filterDoc(ctx context.Context, doc map[string]json.RawMessage, userToken string, userRoles []string) (bool, error) {
 	basePath, err := getBasePath(doc)
