@@ -163,7 +163,7 @@ func getSwaggerListStorageH(srv Service) (string, string, gin.HandlerFunc) {
 // @Router /docs/asyncapi [get]
 func getAsyncapiGetDocsH(srv Service) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, "/docs/asyncapi", func(gc *gin.Context) {
-		docs, err := srv.AsyncapiGetDocs(gc.Request.Context())
+		docs, err := srv.AsyncapiGetDocs(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)))
 		if err != nil {
 			_ = gc.Error(err)
 			return
@@ -185,7 +185,7 @@ func getAsyncapiGetDocsH(srv Service) (string, string, gin.HandlerFunc) {
 // @Router /docs/asyncapi/{id} [get]
 func getAsyncapiGetDocH(srv Service) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, "/docs/asyncapi/:id", func(gc *gin.Context) {
-		doc, err := srv.AsyncapiGetDoc(gc.Request.Context(), gc.Param("id"))
+		doc, err := srv.AsyncapiGetDoc(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)), gc.Param("id"))
 		if err != nil {
 			_ = gc.Error(err)
 			return
@@ -205,7 +205,7 @@ func getAsyncapiGetDocH(srv Service) (string, string, gin.HandlerFunc) {
 // @Router /storage/asyncapi [get]
 func getAsyncapiListStorage(srv Service) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, "/storage/asyncapi", func(gc *gin.Context) {
-		items, err := srv.AsyncapiListStorage(gc.Request.Context())
+		items, err := srv.AsyncapiListStorage(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)))
 		if err != nil {
 			_ = gc.Error(err)
 			return
@@ -238,7 +238,7 @@ func putAsyncapiPutDocH(srv Service) (string, string, gin.HandlerFunc) {
 			_ = gc.Error(err)
 			return
 		}
-		err = srv.AsyncapiPutDoc(gc.Request.Context(), id, data)
+		err = srv.AsyncapiPutDoc(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)), id, data)
 		if err != nil {
 			_ = gc.Error(err)
 			return
@@ -260,7 +260,7 @@ func putAsyncapiPutDocH(srv Service) (string, string, gin.HandlerFunc) {
 // @Router /storage/asyncapi/{id} [delete]
 func deleteAsyncapiDeleteDocH(srv Service) (string, string, gin.HandlerFunc) {
 	return http.MethodDelete, "/storage/asyncapi/:id", func(gc *gin.Context) {
-		err := srv.AsyncapiDeleteDoc(gc.Request.Context(), gc.Param("id"))
+		err := srv.AsyncapiDeleteDoc(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)), gc.Param("id"))
 		if err != nil {
 			_ = gc.Error(err)
 			return
