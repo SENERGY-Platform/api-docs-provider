@@ -81,6 +81,12 @@
                             "type": "object"
                         }
                     },
+                    "404": {
+                        "description": "error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
                     "500": {
                         "description": "error message",
                         "schema": {
@@ -122,6 +128,65 @@
                             "items": {
                                 "type": "object"
                             }
+                        }
+                    },
+                    "500": {
+                        "description": "error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/docs/swagger/{id}": {
+            "get": {
+                "description": "Get a swagger doc.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Swagger"
+                ],
+                "summary": "Get doc",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "user roles",
+                        "name": "X-User-Roles",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "doc id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "swagger doc",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "403": {
+                        "description": "error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "error message",
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     "500": {
@@ -443,14 +508,11 @@
         "models.SwaggerItem": {
             "type": "object",
             "properties": {
-                "description": {
+                "base_path": {
                     "type": "string"
                 },
-                "ext_paths": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
+                "description": {
+                    "type": "string"
                 },
                 "id": {
                     "type": "string"
