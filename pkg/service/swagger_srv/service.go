@@ -212,7 +212,6 @@ func (s *Service) checkRoutes(ctx context.Context, userToken string, userRoles [
 		defer cf()
 		accessPolicies, err := s.ladonClt.GetUserAccessPolicy(ctxWt, userToken, pathMethodMap)
 		if err != nil {
-			fmt.Println("CONTEXT", ctx.Err(), ctxWt.Err())
 			return false, err
 		}
 		return len(accessPolicies) > 0, nil
