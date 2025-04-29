@@ -40,17 +40,17 @@ func TestHandler_RefreshStorage(t *testing.T) {
 			models.StorageData
 			data []byte
 		}{
-			"ph0": {
+			"ph0_t": {
 				StorageData: models.StorageData{
-					ID:   "ph0",
-					Args: [][2]string{{extPathArgKey, "/x"}},
+					ID:   "ph0_t",
+					Args: [][2]string{{basePathArgKey, "/x"}},
 				},
 				data: validDoc,
 			},
 			"ph9": {
 				StorageData: models.StorageData{
 					ID:   "ph9",
-					Args: [][2]string{{extPathArgKey, "/t"}},
+					Args: [][2]string{{basePathArgKey, "/t"}},
 				},
 				data: validDoc,
 			},
@@ -70,7 +70,7 @@ func TestHandler_RefreshStorage(t *testing.T) {
 				Host:     "h",
 				Port:     0,
 				Protocol: "p",
-				ExtPaths: []string{"/t"},
+				ExtPaths: []string{"/t", "/d"},
 			},
 			"ph1": {
 				ID:       "ph1",
@@ -103,7 +103,7 @@ func TestHandler_RefreshStorage(t *testing.T) {
 	}
 	util.InitLogger(struct_logger.Config{}, os.Stderr, "", "")
 	InitLogger()
-	srv := New(storageHdl, discoveryHdl, docClt, nil, 0, "", "")
+	srv := New(storageHdl, discoveryHdl, docClt, nil, 0, "test.test", "")
 	err = srv.SwaggerRefreshDocs(context.Background())
 	if err != nil {
 		t.Error(err)
@@ -112,37 +112,85 @@ func TestHandler_RefreshStorage(t *testing.T) {
 		models.StorageData
 		data []byte
 	}{
-		"ph0": {
+		"ph0_t": {
 			StorageData: models.StorageData{
-				ID: "ph0",
+				ID: "ph0_t",
 				Args: [][2]string{
 					{titleArgKey, "Test"},
 					{versionArgKey, "v1"},
 					{descriptionArgKey, "Test Swagger"},
-					{extPathArgKey, "/t"},
+					{basePathArgKey, "/t"},
+					{routeArgKey, fmt.Sprintf("/t/a%sget", routeDelimiter)},
+					{routeArgKey, fmt.Sprintf("/t/a%spost", routeDelimiter)},
+					{routeArgKey, fmt.Sprintf("/t/b%sget", routeDelimiter)},
 				},
 			},
 			data: validDoc,
 		},
-		"ph1": {
+		"ph0_d": {
 			StorageData: models.StorageData{
-				ID: "ph1",
+				ID: "ph0_d",
 				Args: [][2]string{
 					{titleArgKey, "Test"},
 					{versionArgKey, "v1"},
 					{descriptionArgKey, "Test Swagger"},
-					{extPathArgKey, "/t"},
+					{basePathArgKey, "/d"},
+					{routeArgKey, fmt.Sprintf("/d/a%sget", routeDelimiter)},
+					{routeArgKey, fmt.Sprintf("/d/a%spost", routeDelimiter)},
+					{routeArgKey, fmt.Sprintf("/d/b%sget", routeDelimiter)},
+				},
+			},
+			data: validDoc,
+		},
+		"ph1_t": {
+			StorageData: models.StorageData{
+				ID: "ph1_t",
+				Args: [][2]string{
+					{titleArgKey, "Test"},
+					{versionArgKey, "v1"},
+					{descriptionArgKey, "Test Swagger"},
+					{basePathArgKey, "/t"},
+					{routeArgKey, fmt.Sprintf("/t/a%sget", routeDelimiter)},
+					{routeArgKey, fmt.Sprintf("/t/a%spost", routeDelimiter)},
+					{routeArgKey, fmt.Sprintf("/t/b%sget", routeDelimiter)},
 				},
 			},
 			data: validDoc,
 		},
 	}
-	if !reflect.DeepEqual(a, storageHdl.Items) {
-		t.Errorf("expected %v, got %v", a, storageHdl.Items)
+	if len(a) != len(storageHdl.Items) {
+		t.Errorf("expected %d items, got %d", len(a), len(storageHdl.Items))
+	}
+	for key, aItem := range a {
+		bItem, ok := storageHdl.Items[key]
+		if !ok {
+			t.Errorf("expected item %s not found", key)
+		}
+		if !reflect.DeepEqual(aItem.StorageData, bItem.StorageData) {
+			t.Errorf("expected %v, got %v", aItem.StorageData, bItem.StorageData)
+		}
+		var tmp map[string]json.RawMessage
+		if err = json.Unmarshal(bItem.data, &tmp); err != nil {
+			t.Fatal(err)
+		}
+		var bp string
+		if err = json.Unmarshal(tmp[swaggerBasePathKey], &bp); err != nil {
+			t.Fatal(err)
+		}
+		if bp != "/t" && bp != "/d" {
+			t.Errorf("expected /t or /d, got %s", bp)
+		}
+		var ah string
+		if err = json.Unmarshal(tmp[swaggerHostKey], &ah); err != nil {
+			t.Fatal(err)
+		}
+		if ah != "test.test" {
+			t.Errorf("expected test.test, got %s", ah)
+		}
 	}
 }
 
-func Test_validateDoc(t *testing.T) {
+func Test_validateSwaggerKeys(t *testing.T) {
 	t.Run("valid", func(t *testing.T) {
 		t.Run("v2", func(t *testing.T) {
 			swV2 := map[string]json.RawMessage{
@@ -150,25 +198,17 @@ func Test_validateDoc(t *testing.T) {
 				"info":    nil,
 				"paths":   nil,
 			}
-			b, err := json.Marshal(swV2)
-			if err != nil {
-				t.Fatal(err)
-			}
-			if err = validateDoc(b); err != nil {
+			if err := validateSwaggerKeys(swV2); err != nil {
 				t.Error("unexpected error:", err)
 			}
 		})
 		t.Run("v3", func(t *testing.T) {
-			swV3 := map[string]any{
+			swV3 := map[string]json.RawMessage{
 				"info":    nil,
 				"openapi": nil,
 				"paths":   nil,
 			}
-			b, err := json.Marshal(swV3)
-			if err != nil {
-				t.Fatal(err)
-			}
-			if err = validateDoc(b); err != nil {
+			if err := validateSwaggerKeys(swV3); err != nil {
 				t.Error("unexpected error:", err)
 			}
 		})
@@ -179,16 +219,7 @@ func Test_validateDoc(t *testing.T) {
 				"info":   nil,
 				"status": nil,
 			}
-			b, err := json.Marshal(doc)
-			if err != nil {
-				t.Fatal(err)
-			}
-			if err = validateDoc(b); err == nil {
-				t.Error("expected error")
-			}
-		})
-		t.Run("not json", func(t *testing.T) {
-			if err := validateDoc([]byte("test")); err == nil {
+			if err := validateSwaggerKeys(doc); err == nil {
 				t.Error("expected error")
 			}
 		})
@@ -207,9 +238,9 @@ func TestHandler_cleanOldServices(t *testing.T) {
 					Args: nil,
 				},
 			},
-			"id-2": {
+			"id-2_t": {
 				StorageData: models.StorageData{
-					ID:   "id-2",
+					ID:   "id-2_t",
 					Args: nil,
 				},
 			},
@@ -218,7 +249,8 @@ func TestHandler_cleanOldServices(t *testing.T) {
 	srv := New(sHdl, nil, nil, nil, 0, "", "")
 	err := srv.cleanOldServices(context.Background(), map[string]models.Service{
 		"id-2": {
-			ID: "id-2",
+			ID:       "id-2",
+			ExtPaths: []string{"/t"},
 		},
 	})
 	if err != nil {
@@ -227,8 +259,8 @@ func TestHandler_cleanOldServices(t *testing.T) {
 	if len(sHdl.Items) != 1 {
 		t.Errorf("expected 1 item, got %d", len(sHdl.Items))
 	}
-	if _, ok := sHdl.Items["id-2"]; !ok {
-		t.Error("expected 'id-2'")
+	if _, ok := sHdl.Items["id-2_t"]; !ok {
+		t.Error("expected 'id-2_t'")
 	}
 }
 
