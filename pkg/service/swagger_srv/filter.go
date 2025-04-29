@@ -20,6 +20,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"path"
 	"regexp"
 )
@@ -177,6 +178,8 @@ func setDocDefs(doc map[string]json.RawMessage, newDefs map[string]json.RawMessa
 }
 
 func getNewDefinitions(oldDefs map[string]json.RawMessage, allowedRefs map[string]struct{}) map[string]json.RawMessage {
+	fmt.Println(oldDefs)
+	fmt.Println(allowedRefs)
 	for ref, rawMessage := range oldDefs {
 		if _, ok := allowedRefs[ref]; ok {
 			getDefinitionRefs(rawMessage, allowedRefs)
