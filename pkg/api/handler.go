@@ -139,7 +139,11 @@ func patchSwaggerRefreshDocsH(srv Service) (string, string, gin.HandlerFunc) {
 // @Router /storage/swagger [get]
 func getSwaggerListStorageH(srv Service) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, "/storage/swagger", func(gc *gin.Context) {
-		items, err := srv.SwaggerListStorage(gc.Request.Context())
+		var userRoles []string
+		if val := gc.GetHeader(HeaderUserRoles); val != "" {
+			userRoles = strings.Split(val, ", ")
+		}
+		items, err := srv.SwaggerListStorage(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)), gc.Request.Header.Get(HeaderAuthorization), userRoles)
 		if err != nil {
 			_ = gc.Error(err)
 			return
