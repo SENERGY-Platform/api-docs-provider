@@ -195,6 +195,7 @@ func (s *Service) SwaggerListStorage(ctx context.Context, userToken string, user
 				}
 			}(storageItem)
 		}
+		wg.Wait()
 	}
 	return swaggerItems, nil
 }
