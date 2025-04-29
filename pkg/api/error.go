@@ -35,6 +35,10 @@ func GetStatusCode(err error) int {
 	if errors.As(err, &ie) {
 		return http.StatusInternalServerError
 	}
+	var fe *lib_models.ForbiddenError
+	if errors.As(err, &fe) {
+		return http.StatusForbidden
+	}
 	var rbe *lib_models.ResourceBusyError
 	if errors.As(err, &rbe) {
 		return http.StatusConflict
