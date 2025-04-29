@@ -102,12 +102,12 @@ func getSwaggerGetDocH(srv Service) (string, string, gin.HandlerFunc) {
 		if val := gc.GetHeader(HeaderUserRoles); val != "" {
 			userRoles = strings.Split(val, ", ")
 		}
-		docs, err := srv.SwaggerGetDoc(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)), gc.Param("id"), gc.Request.Header.Get(HeaderAuthorization), userRoles)
+		doc, err := srv.SwaggerGetDoc(context.WithValue(gc.Request.Context(), models.ContextRequestID, requestid.Get(gc)), gc.Param("id"), gc.Request.Header.Get(HeaderAuthorization), userRoles)
 		if err != nil {
 			_ = gc.Error(err)
 			return
 		}
-		gc.JSON(http.StatusOK, docs)
+		gc.Data(http.StatusOK, gin.MIMEJSON, doc)
 	}
 }
 
