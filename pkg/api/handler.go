@@ -180,6 +180,7 @@ func getAsyncapiGetDocsH(srv Service) (string, string, gin.HandlerFunc) {
 // @Param Authorization header string false "jwt token"
 // @Param id path string true "doc id"
 // @Success	200 {object} object "asyncapi doc"
+// @Failure	404 {string} string "error message"
 // @Failure	500 {string} string "error message"
 // @Router /docs/asyncapi/{id} [get]
 func getAsyncapiGetDocH(srv Service) (string, string, gin.HandlerFunc) {
