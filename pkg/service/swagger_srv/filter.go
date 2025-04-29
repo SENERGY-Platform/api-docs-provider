@@ -52,8 +52,6 @@ func (s *Service) filterDoc(ctx context.Context, doc map[string]json.RawMessage,
 			return false, err
 		}
 	}
-	b, _ := json.Marshal(allowedRefs)
-	fmt.Println(string(b))
 	if len(newPaths) == 0 {
 		return false, nil
 	}
@@ -198,6 +196,7 @@ func getDefinitionRefs(raw []byte, refs map[string]struct{}) {
 	res := regRegex.FindAllSubmatch(raw, -1)
 	for _, re := range res {
 		if len(re) > 1 {
+			fmt.Println(string(re[0]), " | ", string(re[1]))
 			refs[string(re[1])] = struct{}{}
 		}
 	}
