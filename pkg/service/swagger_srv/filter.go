@@ -75,6 +75,7 @@ func (s *Service) getNewPathsByToken(ctx context.Context, oldPaths map[string]ma
 	ctxWt, cf := context.WithTimeout(ctx, s.timeout)
 	defer cf()
 	accessPolicies, err := s.ladonClt.GetUserAccessPolicy(ctxWt, userToken, getPathMethodsMap(oldPaths, basePath))
+	fmt.Println(json.Marshal(accessPolicies))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -178,8 +179,6 @@ func setDocDefs(doc map[string]json.RawMessage, newDefs map[string]json.RawMessa
 }
 
 func getNewDefinitions(oldDefs map[string]json.RawMessage, allowedRefs map[string]struct{}) map[string]json.RawMessage {
-	fmt.Println(oldDefs)
-	fmt.Println(allowedRefs)
 	for ref, rawMessage := range oldDefs {
 		if _, ok := allowedRefs[ref]; ok {
 			getDefinitionRefs(rawMessage, allowedRefs)
