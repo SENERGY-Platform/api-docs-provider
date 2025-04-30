@@ -20,6 +20,7 @@ import (
 	"context"
 	"encoding/json"
 	lib_models "github.com/SENERGY-Platform/api-docs-provider/lib/models"
+	"github.com/SENERGY-Platform/go-service-base/srv-info-hdl"
 )
 
 type swaggerService interface {
@@ -35,4 +36,8 @@ type asyncapiService interface {
 	AsyncapiPutDoc(ctx context.Context, id string, data []byte) error
 	AsyncapiDeleteDoc(ctx context.Context, id string) error
 	AsyncapiListStorage(ctx context.Context) ([]lib_models.AsyncapiItem, error)
+}
+
+type serviceInfoHandler interface {
+	ServiceInfo() srv_info_hdl.ServiceInfo
 }

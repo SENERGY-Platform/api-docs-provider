@@ -16,20 +16,16 @@
 
 package service
 
-import (
-	srv_info_hdl "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl"
-)
-
 type Service struct {
 	swaggerService
 	asyncapiService
-	srv_info_hdl.SrvInfoHandler
+	serviceInfoHandler
 }
 
-func New(swaggerSrv swaggerService, asyncapiSrv asyncapiService, srvInfoHdl srv_info_hdl.SrvInfoHandler) *Service {
+func New(swaggerSrv swaggerService, asyncapiSrv asyncapiService, srvInfoHdl serviceInfoHandler) *Service {
 	return &Service{
-		swaggerService:  swaggerSrv,
-		asyncapiService: asyncapiSrv,
-		SrvInfoHandler:  srvInfoHdl,
+		swaggerService:     swaggerSrv,
+		asyncapiService:    asyncapiSrv,
+		serviceInfoHandler: srvInfoHdl,
 	}
 }

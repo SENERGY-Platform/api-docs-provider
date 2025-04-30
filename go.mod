@@ -6,11 +6,9 @@ require (
 	github.com/SENERGY-Platform/api-docs-provider/lib/models v0.0.0-00000000000000-000000000000
 	github.com/SENERGY-Platform/gin-middleware v0.9.0
 	github.com/SENERGY-Platform/go-base-http-client v0.1.0
-	github.com/SENERGY-Platform/go-service-base/config-hdl v1.1.0
+	github.com/SENERGY-Platform/go-service-base/config-hdl v1.2.0
+	github.com/SENERGY-Platform/go-service-base/srv-info-hdl v0.2.0
 	github.com/SENERGY-Platform/go-service-base/struct-logger v0.4.1
-	github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl v0.0.4
-	github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl/lib v0.0.3
-	github.com/SENERGY-Platform/mgw-go-service-base/util v1.1.1
 	github.com/gin-contrib/requestid v1.0.5
 	github.com/gin-gonic/gin v1.10.0
 	github.com/google/uuid v1.6.0

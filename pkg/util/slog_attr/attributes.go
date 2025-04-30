@@ -27,5 +27,6 @@ const (
 	IDKey            = "id"
 	NumberKey        = "number"
 	VersionKey       = "version"
+	ConfigValuesKey  = "config_values"
 	ComponentKey     = "component"
 )

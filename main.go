@@ -32,9 +32,9 @@ import (
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/service/swagger_srv"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/util"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/util/slog_attr"
+	sb_config_hdl "github.com/SENERGY-Platform/go-service-base/config-hdl"
+	"github.com/SENERGY-Platform/go-service-base/srv-info-hdl"
 	"github.com/SENERGY-Platform/go-service-base/struct-logger/attributes"
-	srv_info_hdl "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl"
-	sb_util "github.com/SENERGY-Platform/mgw-go-service-base/util"
 	"net/http"
 	"os"
 	"sync"
@@ -60,14 +60,12 @@ func main() {
 		return
 	}
 
-	util.InitLogger(cfg.Logger, os.Stderr, "github.com/SENERGY-Platform", srvInfoHdl.GetName())
+	util.InitLogger(cfg.Logger, os.Stderr, "github.com/SENERGY-Platform", srvInfoHdl.Name())
 	discovery_hdl.InitLogger()
 	swagger_srv.InitLogger()
 	asyncapi_srv.InitLogger()
 
-	util.Logger.Info("starting service", slog_attr.VersionKey, srvInfoHdl.GetVersion())
-
-	util.Logger.Debug(sb_util.ToJsonStr(cfg))
+	util.Logger.Info("starting service", slog_attr.VersionKey, srvInfoHdl.Version(), slog_attr.ConfigValuesKey, sb_config_hdl.StructToMap(cfg, true))
 
 	swaggerStgHdl := storage_hdl.New(cfg.Storage.SwaggerDataPath, "swagger")
 	kongClt := kong_clt.New(&http.Client{Transport: http.DefaultTransport}, cfg.Discovery.Kong.BaseURL, cfg.Discovery.Kong.User, cfg.Discovery.Kong.Password.Value())
@@ -82,8 +80,8 @@ func main() {
 	srv := service.New(swaggerSrv, asyncapiSrv, srvInfoHdl)
 
 	httpHandler, err := api.New(srv, map[string]string{
-		lib_models.HeaderApiVer:  srvInfoHdl.GetVersion(),
-		lib_models.HeaderSrvName: srvInfoHdl.GetName(),
+		lib_models.HeaderApiVer:  srvInfoHdl.Version(),
+		lib_models.HeaderSrvName: srvInfoHdl.Name(),
 	}, cfg.HttpAccessLog)
 	if err != nil {
 		util.Logger.Error("creating http engine failed", attributes.ErrorKey, err)

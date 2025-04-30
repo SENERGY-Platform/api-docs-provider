@@ -22,8 +22,8 @@ import (
 	lib_models "github.com/SENERGY-Platform/api-docs-provider/lib/models"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/models"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/util"
+	_ "github.com/SENERGY-Platform/go-service-base/srv-info-hdl"
 	"github.com/SENERGY-Platform/go-service-base/struct-logger/attributes"
-	_ "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl/lib"
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 	"io"
@@ -274,12 +274,12 @@ func deleteAsyncapiDeleteDocH(srv Service) (string, string, gin.HandlerFunc) {
 // @Description	Get basic service and runtime information.
 // @Tags Info
 // @Produce	json
-// @Success	200 {object} lib.SrvInfo "info"
+// @Success	200 {object} srv_info_hdl.ServiceInfo "info"
 // @Failure	500 {string} string "error message"
 // @Router /info [get]
 func getInfoH(srv Service) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, "/info", func(gc *gin.Context) {
-		gc.JSON(http.StatusOK, srv.GetInfo())
+		gc.JSON(http.StatusOK, srv.ServiceInfo())
 	}
 }
 

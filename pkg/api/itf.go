@@ -20,7 +20,7 @@ import (
 	"context"
 	"encoding/json"
 	lib_models "github.com/SENERGY-Platform/api-docs-provider/lib/models"
-	srv_info_hdl "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl"
+	srv_info_hdl "github.com/SENERGY-Platform/go-service-base/srv-info-hdl"
 )
 
 type Service interface {
@@ -33,5 +33,5 @@ type Service interface {
 	AsyncapiPutDoc(ctx context.Context, id string, data []byte) error
 	AsyncapiDeleteDoc(ctx context.Context, id string) error
 	AsyncapiListStorage(ctx context.Context) ([]lib_models.AsyncapiItem, error)
-	srv_info_hdl.SrvInfoHandler
+	ServiceInfo() srv_info_hdl.ServiceInfo
 }
