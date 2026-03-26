@@ -541,3 +541,7 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/go,intellij+all,vs,linux,windows,macos
+
+swagger
+.vscode
+__debug*
