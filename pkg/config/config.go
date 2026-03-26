@@ -60,6 +60,7 @@ type Config struct {
 	Filter        FilterConfig         `json:"filter"`
 	HttpTimeout   time.Duration        `json:"http_timeout" env_var:"HTTP_TIMEOUT"`
 	HttpAccessLog bool                 `json:"http_access_log" env_var:"HTTP_ACCESS_LOG"`
+	HandleCors    bool                 `json:"handle_cors" env_var:"HANDLE_CORS"`
 }
 
 func New(path string) (*Config, error) {

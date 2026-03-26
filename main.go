@@ -82,7 +82,7 @@ func main() {
 	httpHandler, err := api.New(srv, map[string]string{
 		lib_models.HeaderApiVer:  srvInfoHdl.Version(),
 		lib_models.HeaderSrvName: srvInfoHdl.Name(),
-	}, cfg.HttpAccessLog)
+	}, cfg.HttpAccessLog, cfg.HandleCors)
 	if err != nil {
 		util.Logger.Error("creating http engine failed", attributes.ErrorKey, err)
 		ec = 1

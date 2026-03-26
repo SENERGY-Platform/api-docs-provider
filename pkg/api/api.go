@@ -22,6 +22,7 @@ import (
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/util/slog_attr"
 	gin_mw "github.com/SENERGY-Platform/gin-middleware"
 	"github.com/SENERGY-Platform/go-service-base/struct-logger/attributes"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 )
@@ -33,7 +34,7 @@ import (
 // @license.name Apache-2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @BasePath /
-func New(srv Service, staticHeader map[string]string, accessLog bool) (*gin.Engine, error) {
+func New(srv Service, staticHeader map[string]string, accessLog bool, handleCors bool) (*gin.Engine, error) {
 	gin.SetMode(gin.ReleaseMode)
 	httpHandler := gin.New()
 	var middleware []gin.HandlerFunc
@@ -48,6 +49,12 @@ func New(srv Service, staticHeader map[string]string, accessLog bool) (*gin.Engi
 				requestIDGenerator,
 			),
 		)
+	}
+	if handleCors {
+		corsConfig := cors.DefaultConfig()
+		corsConfig.AllowAllOrigins = true
+		corsConfig.AddAllowHeaders("Authorization")
+		middleware = append(middleware, cors.New(corsConfig))
 	}
 	middleware = append(middleware,
 		gin_mw.StaticHeaderHandler(staticHeader),
