@@ -21,6 +21,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
+	"sync"
+	"time"
+
 	lib_models "github.com/SENERGY-Platform/api-docs-provider/lib/models"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/components/doc_clt"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/components/ladon_clt"
@@ -28,9 +32,6 @@ import (
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/util"
 	"github.com/SENERGY-Platform/api-docs-provider/pkg/util/slog_attr"
 	"github.com/SENERGY-Platform/go-service-base/struct-logger/attributes"
-	"strings"
-	"sync"
-	"time"
 )
 
 const (
@@ -215,7 +216,12 @@ func (s *Service) checkRoutes(ctx context.Context, userToken string, userRoles [
 		if err != nil {
 			return false, err
 		}
-		return len(accessPolicies) > 0, nil
+		for _, policies := range accessPolicies {
+			if len(policies) > 0 {
+				return true, nil
+			}
+		}
+		return false, nil
 	} else {
 		for pth, methods := range routes {
 			for _, method := range methods {
